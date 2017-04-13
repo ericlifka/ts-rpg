@@ -1,0 +1,127 @@
+import CellGrid from '../core/cell-grid';
+import BufferColor from './buffer-color';
+
+function pushOntoEnd(target, data) {
+  for (let i = 0; i < data.length; i++) {
+    target.push(data[i]);
+  }
+}
+
+function emptyChunk() {
+  return {
+    vertices: [],
+    generatedColors: [],
+    cubeVertexIndices: [],
+    squareIndex: 0,
+    vertexCount: 0,
+    verticesBuffer: null,
+    verticesColorBuffer: null,
+    verticesIndexBuffer: null
+  };
+}
+
+export default class GlFrame extends CellGrid{
+  gl: any;
+  chunks: any;
+  fillColor: any = {
+    r: 0,
+    g: 0,
+    b: 0
+  };
+
+  constructor(width, height, gl) {
+    super(width, height);
+    this.gl = gl;
+
+    this.createBuffers();
+  }
+
+  createBuffers() {
+    let gl = this.gl;
+    let chunk = emptyChunk();
+    let chunks = [chunk];
+    let height = this.height;
+    let width = this.width;
+
+    let colorGrid = [];
+
+    for (let w = 0; w < width; w++) {
+      let currentColorColumn = [];
+
+      for (let h = 0; h < height; h++) {
+
+        if (chunk.squareIndex >= 5000) {
+          chunk = emptyChunk();
+          chunks.push(chunk);
+        }
+
+        currentColorColumn.push(new BufferColor(chunk, chunk.generatedColors.length));
+
+        pushOntoEnd(chunk.vertices, [
+          w, h, 0,
+          w + 1, h, 0,
+          w + 1, h + 1, 0,
+          w, h + 1, 0
+        ]);
+
+        let color = [0.0, 0.0, 0.0, 1.0];
+        for (let i = 0; i < 4; i++) {
+          pushOntoEnd(chunk.generatedColors, color);
+        }
+
+        pushOntoEnd(chunk.cubeVertexIndices, [
+          chunk.squareIndex, chunk.squareIndex + 1, chunk.squareIndex + 2, // first triangle in square
+          chunk.squareIndex, chunk.squareIndex + 2, chunk.squareIndex + 3  // second
+        ]);
+
+        chunk.squareIndex += 4; // four vertices have been created
+        chunk.vertexCount += 6; // but they're mapped to six render-able vertex indices
+      }
+
+      colorGrid.push(currentColorColumn);
+    }
+
+    chunks.forEach(chunk => {
+      chunk.verticesBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, chunk.verticesBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(chunk.vertices), gl.STATIC_DRAW);
+
+      chunk.verticesColorBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, chunk.verticesColorBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(chunk.generatedColors), gl.STATIC_DRAW);
+
+      chunk.verticesIndexBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, chunk.verticesIndexBuffer);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(chunk.cubeVertexIndices), gl.STATIC_DRAW);
+    });
+
+    this.chunks = chunks;
+    this.cells = colorGrid;
+  }
+
+  flushToBuffers() {
+    let gl = this.gl;
+    this.chunks.forEach(chunk => {
+      gl.bindBuffer(gl.ARRAY_BUFFER, chunk.verticesColorBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(chunk.generatedColors), gl.STATIC_DRAW);
+    });
+  }
+
+  setFillColor(color) {
+    this.fillColor = {
+      r: color.getR() / 255.0,
+      g: color.getG() / 255.0,
+      b: color.getB() / 255.0
+    };
+  }
+
+  clear() {
+    let {r, g, b} = this.fillColor;
+    this.iterateCells(color => {
+      color.setR(r);
+      color.setG(g);
+      color.setB(b);
+      color.index = -1;
+    })
+  }
+}
