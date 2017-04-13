@@ -1,0 +1,20 @@
+html, body {
+  margin: 0;
+  background-color: #202020;
+
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+}
+
+.fps-counter {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #fff;
+  font-size: 20px;
+  padding: 5px;
+}
