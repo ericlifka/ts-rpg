@@ -63,14 +63,36 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-console.log('HI!');
+"use strict";
+
+exports.__esModule = true;
+var TestModule = (function () {
+    function TestModule() {
+    }
+    TestModule.sayHi = function () {
+        return "Hello There! nubnub2";
+    };
+    return TestModule;
+}());
+exports["default"] = TestModule;
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var test_module_1 = __webpack_require__(0);
+window.alert(test_module_1["default"].sayHi());
 
 
 /***/ })
