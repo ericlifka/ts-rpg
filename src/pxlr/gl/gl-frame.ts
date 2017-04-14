@@ -20,7 +20,7 @@ function emptyChunk() {
   };
 }
 
-export default class GlFrame extends CellGrid{
+export default class GlFrame extends CellGrid {
   gl: any;
   chunks: any;
   fillColor: any = {
