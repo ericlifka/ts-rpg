@@ -4,11 +4,13 @@ import WebGL from './pxlr/gl/webgl';
 import KeyboardInput from "./pxlr/controllers/keyboard-input";
 import GamepadInput from "./pxlr/controllers/gamepad-input";
 
-const width = 250;
-const height = 150;
+const dimensions = {
+  width: 250,
+  height: 150
+};
 
-const game = new Game();
-const renderer = new WebGL({ width, height });
+const game = new Game(dimensions);
+const renderer = new WebGL(dimensions);
 const runLoop = new RunLoop();
 const frame = renderer.newRenderFrame();
 const inputs = [

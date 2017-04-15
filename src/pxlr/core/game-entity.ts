@@ -17,4 +17,17 @@ export default class GameEntity {
       child.render(frame);
     });
   }
+
+  addChild(child: GameEntity): void {
+    if (child) {
+      this.children.push(child);
+    }
+  }
+
+  removeChild(child: GameEntity): void {
+    let index = this.children.indexOf(child);
+    if (index >= 0) {
+      this.children.splice(index, 1);
+    }
+  }
 }

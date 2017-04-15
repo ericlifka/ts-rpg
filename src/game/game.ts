@@ -1,18 +1,17 @@
 import CellGrid from "../pxlr/core/cell-grid";
 import GameEntity from "../pxlr/core/game-entity";
+import LevelManager from "./level-screen/level-manager";
 
 export default class Game extends GameEntity {
-  constructor() {
+  dimensions: { width: number, height: number };
+  levelManager: LevelManager;
+
+  constructor(dimensions) {
     super(null);
-  }
 
-  update(dtime: number, inputs: any[]): void {
-    super.update(dtime, inputs);
-  }
+    this.dimensions = dimensions;
+    this.levelManager = new LevelManager(this, dimensions);
 
-  render(frame: CellGrid): void {
-    super.render(frame);
-
-    frame.cellAt(10, 10).setR(1.0);
+    this.addChild(this.levelManager);
   }
 }

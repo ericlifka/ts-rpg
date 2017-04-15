@@ -15,12 +15,13 @@ export default class CellGrid {
   iterateCells(handler: Function): void {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
-        handler(this.cellAt(x, y), x, y);
+        handler(this.cellAt({x, y}), x, y);
       }
     }
   }
 
-  cellAt(x: number, y: number) {
+  cellAt(coord: {x: number, y: number}) {
+    let {x, y} = coord;
     if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
       return this.cells[x][y];
     }
