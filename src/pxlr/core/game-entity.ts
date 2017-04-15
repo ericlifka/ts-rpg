@@ -1,9 +1,10 @@
 import CellGrid from "./cell-grid";
 
 export default class GameEntity {
-  children: GameEntity[] = [];
+  children: GameEntity[];
 
   constructor(public parent: GameEntity) {
+    this.children = [];
   }
 
   update(dtime: number, inputSources: any[]): void {

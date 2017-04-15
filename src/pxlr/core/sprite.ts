@@ -35,12 +35,12 @@ export default class Sprite extends CellGrid {
      */
   }
 
-  renderToFrame(frame, x = 0, y = 0, index = 0) {
+  render(frame: CellGrid, x = 0, y = 0, index = 0) {
     let offset_x = this.meta.offsetAdjustment.x;
     let offset_y = this.meta.offsetAdjustment.y;
     this.iterateCells((color, _x, _y) => {
       if (color && !color.clear) {
-        let frameColor = frame.cellAt(x + _x + offset_x, y + _y + offset_y);
+        let frameColor = frame.cellAt({x: x + _x + offset_x, y: y + _y + offset_y});
         if (index >= frameColor.index) {
           frameColor.copyFromColor(color);
           frameColor.index = index;
