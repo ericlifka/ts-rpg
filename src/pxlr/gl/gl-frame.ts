@@ -1,5 +1,6 @@
 import CellGrid from '../core/cell-grid';
 import BufferColor from './buffer-color';
+import {Dimension} from "../utils/types";
 
 function pushOntoEnd(target, data) {
   for (let i = 0; i < data.length; i++) {
@@ -29,8 +30,8 @@ export default class GlFrame extends CellGrid {
     b: 0
   };
 
-  constructor(width, height, gl) {
-    super(width, height);
+  constructor(dimensions: Dimension, gl) {
+    super(dimensions);
     this.gl = gl;
 
     this.createBuffers();
@@ -40,8 +41,8 @@ export default class GlFrame extends CellGrid {
     let gl = this.gl;
     let chunk = emptyChunk();
     let chunks = [chunk];
-    let height = this.height;
-    let width = this.width;
+    let height = this.dimensions.height;
+    let width = this.dimensions.width;
 
     let colorGrid = [];
 

@@ -30,6 +30,6 @@ export default class LevelManager extends GameEntity {
     frame.cellAt(this.camera.mapToScreenCoord({x: 0, y: 0})).setG(1.0);
     frame.cellAt(this.camera.mapToScreenCoord({x: 5, y: 0})).setR(1.0);
 
-    this.grassTile.render(frame, 0, 0, 10);
+    this.grassTile.render(frame, {x: 0, y: 0}, 10);
   }
 }

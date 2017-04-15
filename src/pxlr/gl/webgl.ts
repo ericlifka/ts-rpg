@@ -26,7 +26,7 @@ export default class WebGL {
     this.initShaders();
     this.setCameraPerspective();
 
-    this.frame = new Frame(this.width, this.height, this.gl);
+    this.frame = new Frame({width: this.width, height: this.height}, this.gl);
   }
 
   public newRenderFrame() {

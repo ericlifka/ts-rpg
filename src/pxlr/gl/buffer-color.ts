@@ -2,12 +2,10 @@ import Color from '../core/color';
 
 export default class BufferColor extends Color {
   opacity: number;
-  index: number;
 
   constructor(public vertexGroup, public colorBufferOffset) {
     super(0, 0, 0);
     this.opacity = 1.0;
-    this.index = -1;
   }
 
   setR(newR) {

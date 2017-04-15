@@ -1,5 +1,7 @@
-export default class Color {
+abstract class Color {
+  index: number;
   constructor(public r: number, public g: number, public b: number) {
+    this.index = -1;
   }
 
   setR(newR): void {
@@ -30,3 +32,5 @@ export default class Color {
     return `#${this.r}${this.g}${this.b}`;
   }
 }
+
+export default Color;
