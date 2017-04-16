@@ -68,7 +68,7 @@ export default class LevelManager extends GameEntity {
           if (newPosition.x !== this.cursor.gridPosition.x || newPosition.y !== this.cursor.gridPosition.y) {
             this.movementClear = -500;
             this.cursor.moveTo(newPosition);
-            this.camera.moveTo(this.cursor.center);
+            this.camera.animateTo(this.cursor.center, 325);
           }
         }
       });
