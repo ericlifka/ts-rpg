@@ -69,6 +69,14 @@ export default class LevelManager extends GameEntity {
           }
         }
       });
+    } else {
+      inputs.forEach(input => {
+        if (input.INPUT_TYPE === "keyboard") {
+          if (!input.W && !input.A && !input.S && !input.D) {
+            this.movementClear = 1;
+          }
+        }
+      });
     }
   }
 
