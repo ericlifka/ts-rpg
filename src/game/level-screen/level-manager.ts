@@ -5,18 +5,22 @@ import {createGrassSprite} from "../sprites/tiles/grass";
 import Sprite from "../../pxlr/core/sprite";
 import {Dimension} from "../../pxlr/utils/types";
 import LevelTile from "./level-tile";
+import Cursor from "./cursor";
 
 export default class LevelManager extends GameEntity {
 
   camera: Camera;
+  cursor: Cursor;
   levelGrid: LevelTile[][];
 
   constructor(parent, public dimensions: Dimension) {
     super(parent);
 
     this.camera = new Camera(this, dimensions);
+    this.cursor = new Cursor(this, this.camera, {x: 1, y: 1});
 
     this.addChild(this.camera);
+    this.addChild(this.cursor);
 
     this.levelGrid = [];
     for (let x = 0; x <= 2; x++) {
