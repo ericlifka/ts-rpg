@@ -2,7 +2,6 @@ import GameEntity from "../../pxlr/core/game-entity";
 import CellGrid from "../../pxlr/core/cell-grid";
 import Camera from "./camera";
 import {createGrassSprite} from "../sprites/tiles/grass";
-import Sprite from "../../pxlr/core/sprite";
 import {Dimension} from "../../pxlr/utils/types";
 import LevelTile from "./level-tile";
 import Cursor from "./cursor";
