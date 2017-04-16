@@ -15,6 +15,8 @@ export default class LevelManager extends GameEntity {
   movementClear: number = 0;
   levelDimensions: Dimension;
 
+  movementDelay: number = 325;
+
   constructor(parent, public dimensions: Dimension) {
     super(parent);
 
@@ -24,7 +26,7 @@ export default class LevelManager extends GameEntity {
     this.addChild(this.camera);
     this.addChild(this.cursor);
 
-    this.levelDimensions = { width: 5, height: 3 };
+    this.levelDimensions = { width: 10, height: 6 };
     this.levelGrid = [];
     for (let x = 0; x < this.levelDimensions.width; x++) {
       this.levelGrid[x] = [];
@@ -66,9 +68,9 @@ export default class LevelManager extends GameEntity {
             y: clamp(this.cursor.gridPosition.y + direction.y, 0, this.levelDimensions.height - 1)
           };
           if (newPosition.x !== this.cursor.gridPosition.x || newPosition.y !== this.cursor.gridPosition.y) {
-            this.movementClear = -500;
+            this.movementClear = -this.movementDelay;
             this.cursor.moveTo(newPosition);
-            this.camera.animateTo(this.cursor.center, 325);
+            this.camera.animateTo(this.cursor.center, this.movementDelay);
           }
         }
       });
