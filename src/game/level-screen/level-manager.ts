@@ -13,6 +13,7 @@ export default class LevelManager extends GameEntity {
   cursor: Cursor;
   levelGrid: LevelTile[][];
   movementClear: number = 0;
+  levelDimensions: Dimension;
 
   constructor(parent, public dimensions: Dimension) {
     super(parent);
@@ -23,11 +24,12 @@ export default class LevelManager extends GameEntity {
     this.addChild(this.camera);
     this.addChild(this.cursor);
 
+    this.levelDimensions = { width: 5, height: 3 };
     this.levelGrid = [];
-    for (let x = 0; x <= 2; x++) {
+    for (let x = 0; x < this.levelDimensions.width; x++) {
       this.levelGrid[x] = [];
 
-      for (let y = 0; y <= 2; y++) {
+      for (let y = 0; y < this.levelDimensions.height; y++) {
         let tile = new LevelTile(this, this.camera, createGrassSprite(), {x, y});
         this.addChild(tile);
         this.levelGrid[x][y] = tile;
@@ -60,12 +62,13 @@ export default class LevelManager extends GameEntity {
           }
 
           let newPosition = {
-            x: clamp(this.cursor.gridPosition.x + direction.x, 0, 2),
-            y: clamp(this.cursor.gridPosition.y + direction.y, 0, 2)
+            x: clamp(this.cursor.gridPosition.x + direction.x, 0, this.levelDimensions.width - 1),
+            y: clamp(this.cursor.gridPosition.y + direction.y, 0, this.levelDimensions.height - 1)
           };
           if (newPosition.x !== this.cursor.gridPosition.x || newPosition.y !== this.cursor.gridPosition.y) {
             this.movementClear = -500;
             this.cursor.moveTo(newPosition);
+            this.camera.moveTo(this.cursor.center);
           }
         }
       });
