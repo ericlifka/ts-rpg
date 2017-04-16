@@ -6,6 +6,7 @@ import CellGrid from "../../pxlr/core/cell-grid";
 
 export default class LevelTile extends GameEntity {
 
+  center: Coordinate;
   position: Coordinate;
   tileSize: number;
 
@@ -14,9 +15,13 @@ export default class LevelTile extends GameEntity {
 
     this.tileSize = sprite.dimensions.width;
 
+    this.center = {
+      x: this.gridPosition.x * this.tileSize,
+      y: this.gridPosition.y * this.tileSize
+    };
     this.position = {
-      x: this.gridPosition.x * this.tileSize - Math.floor(sprite.dimensions.width / 2),
-      y: this.gridPosition.y * this.tileSize - Math.floor(sprite.dimensions.height / 2)
+      x: this.center.x - Math.floor(sprite.dimensions.width / 2),
+      y: this.center.y - Math.floor(sprite.dimensions.height / 2)
     };
   }
 

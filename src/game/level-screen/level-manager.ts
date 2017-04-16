@@ -9,7 +9,7 @@ import LevelTile from "./level-tile";
 export default class LevelManager extends GameEntity {
 
   camera: Camera;
-  grassTile: GameEntity;
+  levelGrid: LevelTile[][];
 
   constructor(parent, public dimensions: Dimension) {
     super(parent);
@@ -18,11 +18,18 @@ export default class LevelManager extends GameEntity {
 
     this.addChild(this.camera);
 
-    this.grassTile = new LevelTile(this, this.camera, createGrassSprite(), {x: 0, y: 0});
-    this.addChild(this.grassTile);
+    this.levelGrid = [];
+    for (let x = 0; x <= 2; x++) {
+      this.levelGrid[x] = [];
 
-    this.grassTile = new LevelTile(this, this.camera, createGrassSprite(), {x: 1, y: 1});
-    this.addChild(this.grassTile);
+      for (let y = 0; y <= 2; y++) {
+        let tile = new LevelTile(this, this.camera, createGrassSprite(), {x, y});
+        this.addChild(tile);
+        this.levelGrid[x][y] = tile;
+      }
+    }
+
+    this.camera.moveTo(this.levelGrid[1][1].center);
   }
 
   update(dtime: number, inputs: any[]): void {
@@ -32,8 +39,10 @@ export default class LevelManager extends GameEntity {
   render(frame: CellGrid): void {
     super.render(frame);
 
-    frame.cellAt(this.camera.mapToScreenCoord({x: 0, y: 0})).setG(1.0);
-
-
+    let center = frame.cellAt(this.camera.centerOffset);
+    center.setR(1.0);
+    center.setG(0.0);
+    center.setB(0.0);
+    center.index = 1000;
   }
 }

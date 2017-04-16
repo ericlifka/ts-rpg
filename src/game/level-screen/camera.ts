@@ -22,4 +22,9 @@ export default class Camera extends GameEntity {
       y: this.centerOffset.y + coord.y - this.position.y
     };
   }
+
+  moveTo(coord: Coordinate): void {
+    this.position.x = coord.x;
+    this.position.y = coord.y;
+  }
 }
