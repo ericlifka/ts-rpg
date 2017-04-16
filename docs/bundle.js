@@ -515,8 +515,11 @@ var GamepadInput = (function () {
         });
     }
     GamepadInput.prototype.getInputState = function () {
-        var gamepad = navigator.getGamepads()[0];
         var gamepadState = gamepadDescriptor();
+        if (!navigator || !navigator.getGamepads || typeof navigator.getGamepads !== "function") {
+            return gamepadState;
+        }
+        var gamepad = navigator.getGamepads()[0];
         if (gamepad && gamepad.connected) {
             gamepad.buttons.forEach(function (button, index) {
                 gamepadState[BUTTON_MAP[index]] = button.pressed;

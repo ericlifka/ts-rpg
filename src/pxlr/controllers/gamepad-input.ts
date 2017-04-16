@@ -52,9 +52,13 @@ export default class GamepadInput {
   }
 
   getInputState() {
-    let gamepad = navigator.getGamepads()[0];
     let gamepadState = gamepadDescriptor();
 
+    if (!navigator || !navigator.getGamepads || typeof navigator.getGamepads !== "function") {
+      return gamepadState;
+    }
+
+    let gamepad = navigator.getGamepads()[0];
     if (gamepad && gamepad.connected) {
       gamepad.buttons.forEach(function (button, index) {
         gamepadState[BUTTON_MAP[index]] = button.pressed;
