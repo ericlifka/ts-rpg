@@ -1,11 +1,12 @@
 import GameEntity from "../../pxlr/core/game-entity";
 import CellGrid from "../../pxlr/core/cell-grid";
 import Camera from "./camera";
-import {createGrassSprite} from "../sprites/tiles/grass";
 import {Coordinate, Dimension} from "../../pxlr/utils/types";
 import LevelTile from "./level-tile";
 import Cursor from "./cursor";
 import {clamp} from "../../pxlr/utils/clamp";
+import GrassTile from "./tiles/grass";
+import WoodsTile from "./tiles/woods";
 
 export default class LevelManager extends GameEntity {
 
@@ -32,7 +33,15 @@ export default class LevelManager extends GameEntity {
       this.levelGrid[x] = [];
 
       for (let y = 0; y < this.levelDimensions.height; y++) {
-        let tile = new LevelTile(this, this.camera, createGrassSprite(), {x, y});
+
+
+        let tile;
+        if (x === 0 || y === 0 || x === this.levelDimensions.width - 1 || y === this.levelDimensions.height - 1) {
+          tile = new WoodsTile(this, this.camera, {x, y});
+        } else {
+          tile = new GrassTile(this, this.camera, {x, y});
+        }
+
         this.addChild(tile);
         this.levelGrid[x][y] = tile;
       }

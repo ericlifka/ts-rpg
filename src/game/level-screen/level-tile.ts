@@ -10,6 +10,7 @@ export default class LevelTile extends GameEntity {
   center: Coordinate;
   position: Coordinate;
   tileSize: number;
+  passable: boolean;
 
   constructor(parent, public camera: Camera, public sprite: Sprite, public gridPosition: Coordinate) {
     super(parent);
