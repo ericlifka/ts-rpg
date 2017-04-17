@@ -6,3 +6,4 @@ const pixels: string[][] =
 export function createCursorSprite(): Sprite {
   return Sprite.newFromColorSheet(pixels);
 }
+export const CURSOR_SPRITE = createCursorSprite();

@@ -93,8 +93,4 @@ export default class LevelManager extends GameEntity {
       });
     }
   }
-
-  render(frame: CellGrid): void {
-    super.render(frame);
-  }
 }

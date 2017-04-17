@@ -6,3 +6,4 @@ const pixels: string[][] =
 export function createTreeSprite(): Sprite {
   return Sprite.newFromColorSheet(pixels);
 }
+export const TREE_SPRITE = createTreeSprite();

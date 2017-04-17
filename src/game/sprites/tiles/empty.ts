@@ -6,3 +6,4 @@ const pixels: string[][] =
 export function createEmptyTileSprite(): Sprite {
   return Sprite.newFromColorSheet(pixels);
 }
+export const EMPTY_TILE_SPRITE = createEmptyTileSprite();

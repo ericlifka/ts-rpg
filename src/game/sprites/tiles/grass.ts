@@ -6,3 +6,4 @@ const pixels: string[][] =
 export function createGrassTileSprite(): Sprite {
   return Sprite.newFromColorSheet(pixels);
 }
+export const GRASS_TILE_SPRITE = createGrassTileSprite();
