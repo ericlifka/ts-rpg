@@ -1,5 +1,4 @@
 import GameEntity from "../../pxlr/core/game-entity";
-import CellGrid from "../../pxlr/core/cell-grid";
 import Camera from "./camera";
 import {Coordinate, Dimension} from "../../pxlr/utils/types";
 import LevelTile from "./level-tile";

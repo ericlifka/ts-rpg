@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 17);
+/******/ 	return __webpack_require__(__webpack_require__.s = 21);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -121,171 +121,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var rgb_color_1 = __webpack_require__(3);
-var FakeCell = (function (_super) {
-    __extends(FakeCell, _super);
-    function FakeCell(x, y, index) {
-        var _this = _super.call(this) || this;
-        _this.x = x;
-        _this.y = y;
-        _this.index = index;
-        return _this;
-    }
-    return FakeCell;
-}(rgb_color_1["default"]));
-var CellGrid = (function () {
-    function CellGrid(dimensions) {
-        this.dimensions = dimensions;
-    }
-    CellGrid.prototype.iterateCells = function (handler) {
-        for (var x = 0; x < this.dimensions.width; x++) {
-            for (var y = 0; y < this.dimensions.height; y++) {
-                var coord = { x: x, y: y };
-                var color = this.cellAt(coord);
-                handler(color, coord);
-            }
-        }
-    };
-    CellGrid.prototype.cellAt = function (coord) {
-        var x = coord.x, y = coord.y;
-        if (x >= 0 && x < this.dimensions.width && y >= 0 && y < this.dimensions.height) {
-            return this.cells[x][y];
-        }
-        else {
-            return new FakeCell(x, y, -1);
-        }
-    };
-    return CellGrid;
-}());
-exports["default"] = CellGrid;
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-var Color = (function () {
-    function Color(r, g, b) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.index = -1;
-    }
-    Color.prototype.setR = function (newR) {
-        this.r = Math.floor(newR) % 256;
-    };
-    Color.prototype.getR = function () {
-        return this.r;
-    };
-    Color.prototype.setG = function (newG) {
-        this.g = Math.floor(newG) % 256;
-    };
-    Color.prototype.getG = function () {
-        return this.g;
-    };
-    Color.prototype.setB = function (newB) {
-        this.b = Math.floor(newB) % 256;
-    };
-    Color.prototype.getB = function () {
-        return this.b;
-    };
-    Color.prototype.getColor = function () {
-        return "#" + this.r + this.g + this.b;
-    };
-    return Color;
-}());
-exports["default"] = Color;
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-exports.__esModule = true;
-var color_1 = __webpack_require__(2);
-var RGBColor = (function (_super) {
-    __extends(RGBColor, _super);
-    function RGBColor(r, g, b) {
-        if (r === void 0) { r = 0; }
-        if (g === void 0) { g = 0; }
-        if (b === void 0) { b = 0; }
-        var _this = _super.call(this, r, g, b) || this;
-        _this.clear = false;
-        return _this;
-    }
-    RGBColor.prototype.setFromHex = function (hex) {
-        if (!hex) {
-            this.clear = true;
-            return;
-        }
-        if (hex.length === 7 || hex.length === 4) {
-            hex = hex.slice(1);
-        }
-        if (hex.length === 3) {
-            hex = hex
-                .split('')
-                .map(function (char) { return char + char; })
-                .join('');
-        }
-        if (hex.length !== 6) {
-            throw new Error("Invalid hex string: " + hex);
-        }
-        this.setR(parseInt(hex.slice(0, 2), 16));
-        this.setG(parseInt(hex.slice(2, 4), 16));
-        this.setB(parseInt(hex.slice(4, 6), 16));
-    };
-    RGBColor.prototype.copyFromColor = function (color) {
-        this.setR(color.getR());
-        this.setG(color.getG());
-        this.setB(color.getB());
-    };
-    RGBColor.prototype.clone = function () {
-        return new RGBColor(this.getR(), this.getG(), this.getB());
-    };
-    RGBColor.fromHex = function (hex) {
-        var color = new RGBColor();
-        color.setFromHex(hex);
-        return color;
-    };
-    return RGBColor;
-}(color_1["default"]));
-exports["default"] = RGBColor;
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-exports.__esModule = true;
-var cell_grid_1 = __webpack_require__(1);
-var rgb_color_1 = __webpack_require__(3);
+var cell_grid_1 = __webpack_require__(4);
+var rgb_color_1 = __webpack_require__(6);
 var Sprite = (function (_super) {
     __extends(Sprite, _super);
     function Sprite(defaultColor, offsetAdjustment) {
@@ -418,7 +255,7 @@ exports["default"] = Sprite;
 
 
 /***/ }),
-/* 5 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -429,6 +266,148 @@ exports.DECORATION = 2;
 exports.CHARACTER = 3;
 exports.OVERLAY = 4;
 exports.INTERFACE = 5;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+var game_entity_1 = __webpack_require__(0);
+var layers_1 = __webpack_require__(2);
+var LevelTile = (function (_super) {
+    __extends(LevelTile, _super);
+    function LevelTile(parent, camera, sprite, gridPosition) {
+        var _this = _super.call(this, parent) || this;
+        _this.camera = camera;
+        _this.sprite = sprite;
+        _this.gridPosition = gridPosition;
+        _this.tileSize = sprite.dimensions.width;
+        _this.center = {
+            x: _this.gridPosition.x * _this.tileSize,
+            y: _this.gridPosition.y * _this.tileSize
+        };
+        _this.position = {
+            x: _this.center.x - Math.floor(_this.sprite.dimensions.width / 2),
+            y: _this.center.y - Math.floor(_this.sprite.dimensions.height / 2)
+        };
+        return _this;
+    }
+    LevelTile.prototype.render = function (frame) {
+        var screenCoord = this.camera.mapToScreenCoord(this.position);
+        this.sprite.render(frame, screenCoord, layers_1.BACKGROUND);
+    };
+    return LevelTile;
+}(game_entity_1["default"]));
+exports["default"] = LevelTile;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+var rgb_color_1 = __webpack_require__(6);
+var FakeCell = (function (_super) {
+    __extends(FakeCell, _super);
+    function FakeCell(x, y, index) {
+        var _this = _super.call(this) || this;
+        _this.x = x;
+        _this.y = y;
+        _this.index = index;
+        return _this;
+    }
+    return FakeCell;
+}(rgb_color_1["default"]));
+var CellGrid = (function () {
+    function CellGrid(dimensions) {
+        this.dimensions = dimensions;
+    }
+    CellGrid.prototype.iterateCells = function (handler) {
+        for (var x = 0; x < this.dimensions.width; x++) {
+            for (var y = 0; y < this.dimensions.height; y++) {
+                var coord = { x: x, y: y };
+                var color = this.cellAt(coord);
+                handler(color, coord);
+            }
+        }
+    };
+    CellGrid.prototype.cellAt = function (coord) {
+        var x = coord.x, y = coord.y;
+        if (x >= 0 && x < this.dimensions.width && y >= 0 && y < this.dimensions.height) {
+            return this.cells[x][y];
+        }
+        else {
+            return new FakeCell(x, y, -1);
+        }
+    };
+    return CellGrid;
+}());
+exports["default"] = CellGrid;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var Color = (function () {
+    function Color(r, g, b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.index = -1;
+    }
+    Color.prototype.setR = function (newR) {
+        this.r = Math.floor(newR) % 256;
+    };
+    Color.prototype.getR = function () {
+        return this.r;
+    };
+    Color.prototype.setG = function (newG) {
+        this.g = Math.floor(newG) % 256;
+    };
+    Color.prototype.getG = function () {
+        return this.g;
+    };
+    Color.prototype.setB = function (newB) {
+        this.b = Math.floor(newB) % 256;
+    };
+    Color.prototype.getB = function () {
+        return this.b;
+    };
+    Color.prototype.getColor = function () {
+        return "#" + this.r + this.g + this.b;
+    };
+    return Color;
+}());
+exports["default"] = Color;
 
 
 /***/ }),
@@ -448,8 +427,75 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
+var color_1 = __webpack_require__(5);
+var RGBColor = (function (_super) {
+    __extends(RGBColor, _super);
+    function RGBColor(r, g, b) {
+        if (r === void 0) { r = 0; }
+        if (g === void 0) { g = 0; }
+        if (b === void 0) { b = 0; }
+        var _this = _super.call(this, r, g, b) || this;
+        _this.clear = false;
+        return _this;
+    }
+    RGBColor.prototype.setFromHex = function (hex) {
+        if (!hex) {
+            this.clear = true;
+            return;
+        }
+        if (hex.length === 7 || hex.length === 4) {
+            hex = hex.slice(1);
+        }
+        if (hex.length === 3) {
+            hex = hex
+                .split('')
+                .map(function (char) { return char + char; })
+                .join('');
+        }
+        if (hex.length !== 6) {
+            throw new Error("Invalid hex string: " + hex);
+        }
+        this.setR(parseInt(hex.slice(0, 2), 16));
+        this.setG(parseInt(hex.slice(2, 4), 16));
+        this.setB(parseInt(hex.slice(4, 6), 16));
+    };
+    RGBColor.prototype.copyFromColor = function (color) {
+        this.setR(color.getR());
+        this.setG(color.getG());
+        this.setB(color.getB());
+    };
+    RGBColor.prototype.clone = function () {
+        return new RGBColor(this.getR(), this.getG(), this.getB());
+    };
+    RGBColor.fromHex = function (hex) {
+        var color = new RGBColor();
+        color.setFromHex(hex);
+        return color;
+    };
+    return RGBColor;
+}(color_1["default"]));
+exports["default"] = RGBColor;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
 var game_entity_1 = __webpack_require__(0);
-var level_manager_1 = __webpack_require__(13);
+var level_manager_1 = __webpack_require__(14);
 var Game = (function (_super) {
     __extends(Game, _super);
     function Game(dimensions) {
@@ -465,7 +511,7 @@ exports["default"] = Game;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -540,7 +586,7 @@ exports["default"] = GamepadInput;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -602,7 +648,7 @@ exports["default"] = KeyboardInput;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -695,13 +741,13 @@ exports["default"] = RunLoop;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var gl_frame_1 = __webpack_require__(19);
+var gl_frame_1 = __webpack_require__(23);
 var WebGL = (function () {
     function WebGL(options) {
         if (options === void 0) { options = {}; }
@@ -883,7 +929,7 @@ exports["default"] = WebGL;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -958,7 +1004,7 @@ exports["default"] = Camera;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -975,15 +1021,15 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var game_entity_1 = __webpack_require__(0);
-var cursor_1 = __webpack_require__(15);
-var layers_1 = __webpack_require__(5);
+var cursor_1 = __webpack_require__(17);
+var layers_1 = __webpack_require__(2);
 var Cursor = (function (_super) {
     __extends(Cursor, _super);
     function Cursor(parent, camera, gridPosition) {
         var _this = _super.call(this, parent) || this;
         _this.camera = camera;
         _this.gridPosition = gridPosition;
-        _this.sprite = cursor_1.createCursorSprite();
+        _this.sprite = cursor_1.CURSOR_SPRITE;
         _this.tileSize = _this.sprite.dimensions.width;
         _this.halfTileSize = Math.floor(_this.tileSize / 2);
         _this.calculatePositionCoordinates();
@@ -1013,7 +1059,7 @@ exports["default"] = Cursor;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1030,11 +1076,11 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var game_entity_1 = __webpack_require__(0);
-var camera_1 = __webpack_require__(11);
-var grass_1 = __webpack_require__(16);
-var level_tile_1 = __webpack_require__(14);
-var cursor_1 = __webpack_require__(12);
-var clamp_1 = __webpack_require__(20);
+var camera_1 = __webpack_require__(12);
+var cursor_1 = __webpack_require__(13);
+var clamp_1 = __webpack_require__(24);
+var grass_1 = __webpack_require__(15);
+var woods_1 = __webpack_require__(16);
 var LevelManager = (function (_super) {
     __extends(LevelManager, _super);
     function LevelManager(parent, dimensions) {
@@ -1051,7 +1097,13 @@ var LevelManager = (function (_super) {
         for (var x = 0; x < _this.levelDimensions.width; x++) {
             _this.levelGrid[x] = [];
             for (var y = 0; y < _this.levelDimensions.height; y++) {
-                var tile = new level_tile_1["default"](_this, _this.camera, grass_1.createGrassSprite(), { x: x, y: y });
+                var tile = void 0;
+                if (x === 0 || y === 0 || x === _this.levelDimensions.width - 1 || y === _this.levelDimensions.height - 1) {
+                    tile = new woods_1["default"](_this, _this.camera, { x: x, y: y });
+                }
+                else {
+                    tile = new grass_1["default"](_this, _this.camera, { x: x, y: y });
+                }
                 _this.addChild(tile);
                 _this.levelGrid[x][y] = tile;
             }
@@ -1101,21 +1153,13 @@ var LevelManager = (function (_super) {
             });
         }
     };
-    LevelManager.prototype.render = function (frame) {
-        _super.prototype.render.call(this, frame);
-        var center = frame.cellAt(this.camera.centerOffset);
-        center.setR(1.0);
-        center.setG(0.0);
-        center.setB(0.0);
-        center.index = 1000;
-    };
     return LevelManager;
 }(game_entity_1["default"]));
 exports["default"] = LevelManager;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1131,48 +1175,18 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var game_entity_1 = __webpack_require__(0);
-var layers_1 = __webpack_require__(5);
-var LevelTile = (function (_super) {
-    __extends(LevelTile, _super);
-    function LevelTile(parent, camera, sprite, gridPosition) {
-        var _this = _super.call(this, parent) || this;
-        _this.camera = camera;
-        _this.sprite = sprite;
-        _this.gridPosition = gridPosition;
-        _this.tileSize = sprite.dimensions.width;
-        _this.center = {
-            x: _this.gridPosition.x * _this.tileSize,
-            y: _this.gridPosition.y * _this.tileSize
-        };
-        _this.position = {
-            x: _this.center.x - Math.floor(_this.sprite.dimensions.width / 2),
-            y: _this.center.y - Math.floor(_this.sprite.dimensions.height / 2)
-        };
+var level_tile_1 = __webpack_require__(3);
+var grass_1 = __webpack_require__(20);
+var GrassTile = (function (_super) {
+    __extends(GrassTile, _super);
+    function GrassTile(parent, camera, gridPosition) {
+        var _this = _super.call(this, parent, camera, grass_1.GRASS_TILE_SPRITE, gridPosition) || this;
+        _this.passable = true;
         return _this;
     }
-    LevelTile.prototype.render = function (frame) {
-        var screenCoord = this.camera.mapToScreenCoord(this.position);
-        this.sprite.render(frame, screenCoord, layers_1.BACKGROUND);
-    };
-    return LevelTile;
-}(game_entity_1["default"]));
-exports["default"] = LevelTile;
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-var sprite_1 = __webpack_require__(4);
-var pixels = [["#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252"], ["#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252"], ["#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252"]];
-function createCursorSprite() {
-    return sprite_1["default"].newFromColorSheet(pixels);
-}
-exports.createCursorSprite = createCursorSprite;
+    return GrassTile;
+}(level_tile_1["default"]));
+exports["default"] = GrassTile;
 
 
 /***/ }),
@@ -1181,15 +1195,39 @@ exports.createCursorSprite = createCursorSprite;
 
 "use strict";
 
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 exports.__esModule = true;
-var sprite_1 = __webpack_require__(4);
-var pixels = 
-// [[null, null, null, "#5FAD6D", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, "#5FAD6D", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, "#5FAD6D", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null], [null, null, "#5FAD6D", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, null, "#5FAD6D", null, null, null, null], [null, "#5FAD6D", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, null, "#5FAD6D", null, null, null, null, null], [null, "#5FAD6D", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, null, "#5FAD6D", null, null, null, null, null], [null, "#5FAD6D", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null, null], [null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", null], [null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", null, null], [null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", null, null], [null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null], [null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, "#5FAD6D", null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null], [null, null, null, "#5FAD6D", null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, "#5FAD6D", null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, "#5FAD6D", null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, "#5FAD6D", null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null], [null, null, "#5FAD6D", null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]];
-[["#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#A4D49F"], ["#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F", "#A4D49F"]];
-function createGrassSprite() {
-    return sprite_1["default"].newFromColorSheet(pixels);
-}
-exports.createGrassSprite = createGrassSprite;
+var level_tile_1 = __webpack_require__(3);
+var layers_1 = __webpack_require__(2);
+var tree_1 = __webpack_require__(18);
+var empty_1 = __webpack_require__(19);
+var WoodsTile = (function (_super) {
+    __extends(WoodsTile, _super);
+    function WoodsTile(parent, camera, gridPosition) {
+        var _this = _super.call(this, parent, camera, empty_1.EMPTY_TILE_SPRITE, gridPosition) || this;
+        _this.passable = false;
+        return _this;
+    }
+    WoodsTile.prototype.render = function (frame) {
+        _super.prototype.render.call(this, frame);
+        var coord = this.camera.mapToScreenCoord(this.position);
+        tree_1.TREE_SPRITE.render(frame, coord, layers_1.DECORATION);
+        tree_1.TREE_SPRITE.render(frame, { x: coord.x + 16, y: coord.y }, layers_1.DECORATION);
+        tree_1.TREE_SPRITE.render(frame, { x: coord.x, y: coord.y + 16 }, layers_1.DECORATION);
+        tree_1.TREE_SPRITE.render(frame, { x: coord.x + 16, y: coord.y + 16 }, layers_1.DECORATION);
+    };
+    return WoodsTile;
+}(level_tile_1["default"]));
+exports["default"] = WoodsTile;
 
 
 /***/ }),
@@ -1199,11 +1237,75 @@ exports.createGrassSprite = createGrassSprite;
 "use strict";
 
 exports.__esModule = true;
-var game_1 = __webpack_require__(6);
-var run_loop_1 = __webpack_require__(9);
-var webgl_1 = __webpack_require__(10);
-var keyboard_input_1 = __webpack_require__(8);
-var gamepad_input_1 = __webpack_require__(7);
+var sprite_1 = __webpack_require__(1);
+var pixels = [[null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null], [null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null], ["#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252"], ["#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252"], ["#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252"], [null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null], [null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null]];
+function createCursorSprite() {
+    return sprite_1["default"].newFromColorSheet(pixels);
+}
+exports.createCursorSprite = createCursorSprite;
+exports.CURSOR_SPRITE = createCursorSprite();
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var sprite_1 = __webpack_require__(1);
+var pixels = [[null, null, null, null, "#87CF6D", "#87CF6D", "#87CF6D", "#87CF6D", "#87CF6D", "#87CF6D", null, null, null, null, null, null], [null, null, "#87CF6D", "#87CF6D", "#6AA133", "#6AA133", "#6AA133", "#6AA133", "#6AA133", "#6AA133", "#87CF6D", "#87CF6D", null, null, null, null], [null, "#87CF6D", "#6AA133", "#6AA133", "#6AA133", "#6AA133", "#6AA133", "#228200", "#6AA133", "#6AA133", "#228200", "#87CF6D", null, null, null, null], ["#87CF6D", "#6AA133", "#6AA133", "#6AA133", "#6AA133", "#6AA133", "#228200", "#9C8A3E", "#6AA133", "#228200", "#B3A16F", "#6AA133", "#87CF6D", null, null, null], ["#4DA847", "#6AA133", "#6AA133", "#6AA133", "#6AA133", "#228200", "#9C8A3E", "#B3A16F", "#228200", "#B3A16F", "#6AA133", "#6AA133", "#6AA133", null, null, null], [null, "#4DA847", "#6AA133", "#228200", "#6AA133", "#6AA133", "#B3A16F", "#B3A16F", "#9C8A3E", "#6AA133", "#6AA133", "#6AA133", "#4DA847", null, null, null], [null, null, "#4DA847", "#B3A16F", "#228200", "#6AA133", "#B3A16F", "#9C8A3E", "#6AA133", "#6AA133", "#4DA847", "#4DA847", null, null, null, null], [null, null, null, null, "#9C8A3E", "#9C8A3E", "#9C8A3E", "#B3A16F", "#4DA847", "#4DA847", null, null, null, null, null, null], [null, null, null, null, null, null, "#B3A16F", "#CFB753", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, "#B3A16F", "#CFB753", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, "#B3A16F", "#CFB753", null, null, null, null, null, null, null, null], [null, null, null, null, null, "#CFB753", "#B3A16F", "#CFB753", null, null, null, null, null, null, null, null], [null, null, null, null, null, "#B3A16F", "#B3A16F", "#B3A16F", "#CFB753", null, null, null, null, null, null, null], [null, null, null, null, "#9C8A3E", "#9C8A3E", "#B3A16F", "#B3A16F", "#B3A16F", "#CFB753", null, null, null, null, null, null], [null, null, null, "#9C8A3E", null, null, "#9C8A3E", "#B3A16F", null, "#B3A16F", "#CFB753", null, null, null, null, null], [null, null, null, null, null, null, null, "#9C8A3E", null, null, null, null, null, null, null, null]];
+function createTreeSprite() {
+    return sprite_1["default"].newFromColorSheet(pixels);
+}
+exports.createTreeSprite = createTreeSprite;
+exports.TREE_SPRITE = createTreeSprite();
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var sprite_1 = __webpack_require__(1);
+var pixels = [[null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]];
+function createEmptyTileSprite() {
+    return sprite_1["default"].newFromColorSheet(pixels);
+}
+exports.createEmptyTileSprite = createEmptyTileSprite;
+exports.EMPTY_TILE_SPRITE = createEmptyTileSprite();
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var sprite_1 = __webpack_require__(1);
+var pixels = [[null, null, null, "#5FAD6D", null, null, null, null, null, "#9BC29B", null, null, null, null, null, null, "#86C284", "#86C284", null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, "#5FAD6D", "#9BC29B", null, null, null, null, "#9BC29B", "#86C284", null, null, null, null, null, null, "#86C284", null, null, null, null, "#86C284", null, null, null, "#9BC29B", null, null, null, null, null, null], [null, null, "#5FAD6D", null, null, null, null, null, "#9BC29B", null, null, null, null, null, null, "#86C284", "#86C284", null, null, null, "#95C78F", "#86C284", null, null, null, "#9BC29B", null, null, null, null, null, null], [null, null, "#5FAD6D", null, null, null, null, null, "#86C284", null, null, null, "#9BC29B", null, null, "#86C284", null, null, null, null, "#95C78F", null, null, null, null, null, null, "#5FAD6D", null, null, null, null], [null, "#5FAD6D", "#9BC29B", null, null, null, null, null, null, null, null, null, "#9BC29B", null, null, null, null, null, null, "#95C78F", "#9BC29B", null, null, null, null, null, "#5FAD6D", "#9BC29B", null, null, null, null], [null, "#5FAD6D", "#9BC29B", null, null, null, null, null, null, null, null, null, "#9BC29B", "#86C284", null, null, null, null, null, "#95C78F", "#9BC29B", null, null, null, null, null, "#5FAD6D", "#9BC29B", null, null, null, null], [null, "#9BC29B", "#9BC29B", null, null, null, null, null, null, null, null, null, "#86C284", "#86C284", null, null, null, null, "#86C284", "#95C78F", "#9BC29B", null, null, null, null, null, "#9BC29B", "#9BC29B", null, null, null, "#9BC29B"], [null, "#9BC29B", "#9BC29B", null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, "#86C284", "#9BC29B", "#9BC29B", null, null, null, null, null, null, null, null, null, "#86C284", "#9BC29B"], [null, null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#86C284", "#9BC29B"], [null, null, null, null, null, null, null, "#729E62", "#9BC29B", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#86C284", null], [null, null, null, null, null, null, null, "#729E62", "#9BC29B", null, null, null, null, null, null, null, "#9BC29B", null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, "#9BC29B", "#9BC29B", null, null, null, null, null, null, null, "#9BC29B", null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, "#9BC29B", null, null, null, "#9BC29B", "#86C284", null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, "#9BC29B", "#86C284", null, null, null, null, "#86C284", null, null, "#729E62", "#9BC29B", null, null, null, null, null, null, null, null, null, null], [null, null, null, null, "#95C78F", null, null, null, null, null, null, "#9BC29B", null, null, null, null, null, null, null, null, "#729E62", "#9BC29B", null, null, null, null, null, null, null, null, null, null], [null, null, null, "#95C78F", "#86C284", null, null, null, null, null, null, "#9BC29B", null, null, null, null, null, null, null, null, "#9BC29B", "#9BC29B", null, null, null, null, null, null, null, null, "#95C78F", null], [null, null, null, "#95C78F", "#86C284", null, null, null, null, null, "#9BC29B", "#86C284", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#95C78F", "#86C284", null], [null, null, null, "#95C78F", "#86C284", null, null, null, null, null, "#86C284", null, null, null, null, "#86C284", null, null, "#86C284", null, null, null, null, null, null, null, "#86C284", null, null, "#95C78F", null, null], [null, "#86C284", null, "#95C78F", "#86C284", null, null, null, null, null, null, null, null, null, "#86C284", "#86C284", null, "#9BC29B", "#86C284", null, null, null, null, null, null, "#9BC29B", "#86C284", null, "#95C78F", "#86C284", null, null], ["#9BC29B", null, null, "#95C78F", "#86C284", null, null, null, null, null, null, null, null, null, "#86C284", null, null, "#9BC29B", "#86C284", null, null, null, null, null, null, "#9BC29B", null, null, "#95C78F", "#86C284", null, null], ["#9BC29B", null, null, "#86C284", "#86C284", null, null, null, null, null, null, null, null, null, "#86C284", null, null, "#9BC29B", "#86C284", null, null, null, null, null, "#86C284", "#9BC29B", null, null, "#86C284", null, null, null], ["#9BC29B", null, null, null, null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, "#86C284", "#86C284", null, null, null, null, null, "#86C284", null, null, null, null, null, null, null], [null, null, null, "#5FAD6D", null, null, null, null, null, "#729E62", "#9BC29B", null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null], [null, null, null, "#5FAD6D", null, null, null, null, null, "#729E62", null, null, null, null, null, null, null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, "#5FAD6D", null, null, null, null, "#729E62", "#9BC29B", null, null, null, null, "#86C284", null, null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, "#5FAD6D", "#9BC29B", null, null, null, null, "#729E62", "#9BC29B", null, null, null, "#9BC29B", "#86C284", null, null, "#95C78F", null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, "#5FAD6D", "#9BC29B", null, null, null, null, "#9BC29B", "#9BC29B", null, null, null, "#9BC29B", null, null, null, "#95C78F", null, null, null, null, null, null, "#729E62", null, null, null, null, null, null, null], [null, null, "#5FAD6D", "#9BC29B", null, null, null, null, null, null, null, null, null, "#86C284", null, null, null, "#95C78F", null, null, null, null, null, "#729E62", "#9BC29B", null, null, null, null, null, null, null], [null, null, "#9BC29B", "#9BC29B", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#729E62", "#9BC29B", null, null, null, null, null, null, null], [null, null, null, null, null, null, "#9BC29B", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#9BC29B", "#9BC29B", null, null, null, null, null, "#86C284", null], [null, null, null, null, null, "#9BC29B", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#9BC29B", "#86C284", null], [null, null, null, null, null, "#9BC29B", null, null, null, null, null, null, null, null, null, null, null, "#86C284", null, null, null, null, null, null, null, null, null, null, null, "#9BC29B", null, null]];
+function createGrassTileSprite() {
+    return sprite_1["default"].newFromColorSheet(pixels);
+}
+exports.createGrassTileSprite = createGrassTileSprite;
+exports.GRASS_TILE_SPRITE = createGrassTileSprite();
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var game_1 = __webpack_require__(7);
+var run_loop_1 = __webpack_require__(10);
+var webgl_1 = __webpack_require__(11);
+var keyboard_input_1 = __webpack_require__(9);
+var gamepad_input_1 = __webpack_require__(8);
 var dimensions = {
     width: 250,
     height: 150
@@ -1238,7 +1340,7 @@ window.addEventListener("focus", function () {
 
 
 /***/ }),
-/* 18 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1254,7 +1356,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var color_1 = __webpack_require__(2);
+var color_1 = __webpack_require__(5);
 var BufferColor = (function (_super) {
     __extends(BufferColor, _super);
     function BufferColor(vertexGroup, colorBufferOffset) {
@@ -1295,7 +1397,7 @@ exports["default"] = BufferColor;
 
 
 /***/ }),
-/* 19 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1311,8 +1413,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var cell_grid_1 = __webpack_require__(1);
-var buffer_color_1 = __webpack_require__(18);
+var cell_grid_1 = __webpack_require__(4);
+var buffer_color_1 = __webpack_require__(22);
 function pushOntoEnd(target, data) {
     for (var i = 0; i < data.length; i++) {
         target.push(data[i]);
@@ -1420,7 +1522,7 @@ exports["default"] = GlFrame;
 
 
 /***/ }),
-/* 20 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

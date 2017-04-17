@@ -1,7 +1,7 @@
 import GameEntity from "../../pxlr/core/game-entity";
 import {Coordinate} from "../../pxlr/utils/types";
 import Camera from "./camera";
-import {createCursorSprite, CURSOR_SPRITE} from "../sprites/cursor";
+import {CURSOR_SPRITE} from "../sprites/cursor";
 import Sprite from "../../pxlr/core/sprite";
 import CellGrid from "../../pxlr/core/cell-grid";
 import {OVERLAY} from "../../pxlr/utils/layers";
