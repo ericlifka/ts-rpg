@@ -87,11 +87,5 @@ export default class LevelManager extends GameEntity {
 
   render(frame: CellGrid): void {
     super.render(frame);
-
-    let center = frame.cellAt(this.camera.centerOffset);
-    center.setR(1.0);
-    center.setG(0.0);
-    center.setB(0.0);
-    center.index = 1000;
   }
 }
