@@ -16,10 +16,6 @@ function updateFPScounter(dtime) {
   fpsCounterDOM.innerHTML = fpsStr;
 }
 
-function now() {
-  return (new Date()).valueOf();
-}
-
 class FpsTracker {
   frameTimes: number[] = [];
   totalTime: number = 20 * 100;
@@ -44,7 +40,7 @@ class FpsTracker {
 export default class RunLoop {
   fpsTracker: FpsTracker = new FpsTracker();
   active: boolean = false;
-  lastFrameTime: number = now();
+  lastFrameTime: number = Date.now();
   boundFrameHandler: (time: number) => void;
   frameCount: number = 0;
 
@@ -55,7 +51,7 @@ export default class RunLoop {
   frameHandler(time: number): void {
     if (!this.active) return;
 
-    let currentTime = now();
+    let currentTime = Date.now();
     let dtime = currentTime - this.lastFrameTime;
 
     this.lastFrameTime = currentTime;
