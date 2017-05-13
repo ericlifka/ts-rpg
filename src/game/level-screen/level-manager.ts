@@ -26,7 +26,7 @@ export default class LevelManager extends GameEntity {
     this.addChild(this.camera);
     this.addChild(this.cursor);
 
-    this.levelDimensions = { width: 10, height: 6 };
+    this.levelDimensions = {width: 10, height: 6};
     this.levelGrid = [];
     for (let x = 0; x < this.levelDimensions.width; x++) {
       this.levelGrid[x] = [];
@@ -75,7 +75,8 @@ export default class LevelManager extends GameEntity {
             x: clamp(this.cursor.gridPosition.x + direction.x, 0, this.levelDimensions.width - 1),
             y: clamp(this.cursor.gridPosition.y + direction.y, 0, this.levelDimensions.height - 1)
           };
-          if (newPosition.x !== this.cursor.gridPosition.x || newPosition.y !== this.cursor.gridPosition.y) {
+
+          if (this.isValidCursorTarget(newPosition)) {
             this.movementClear = -this.movementDelay;
             this.cursor.moveTo(newPosition);
             this.camera.animateTo(this.cursor.center, this.movementDelay);
@@ -91,5 +92,13 @@ export default class LevelManager extends GameEntity {
         }
       });
     }
+  }
+
+  isValidCursorTarget(target: Coordinate): boolean {
+    return (
+        target.x === this.cursor.gridPosition.x &&
+        target.y === this.cursor.gridPosition.y
+      ) ||
+      !this.levelGrid[target.x][target.y].border_tile;
   }
 }

@@ -15,7 +15,5 @@ const SPRITES = [
 export default class GrassTile extends LevelTile {
   constructor(parent, camera: Camera, gridPosition: Coordinate) {
     super(parent, camera, randomElement(SPRITES)(), gridPosition);
-
-    this.passable = true;
   }
 }
