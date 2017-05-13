@@ -1,7 +1,6 @@
 import CellGrid from './cell-grid';
 import RGBColor from './rgb-color';
-import {Coordinate, Dimension} from "../utils/types";
-import Color from "./color";
+import {Color, Coordinate, Dimension} from "../utils/types";
 
 export default class Sprite extends CellGrid<RGBColor> {
   finished: true;

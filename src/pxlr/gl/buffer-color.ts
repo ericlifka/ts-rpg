@@ -1,11 +1,16 @@
-import Color from '../core/color';
+import {Color} from "../utils/types";
 
-export default class BufferColor extends Color {
-  opacity: number;
+export default class BufferColor implements Color {
+  public index: number;
+  public opacity: number;
+
+  private r: number = 0;
+  private g: number = 0;
+  private b: number = 0;
 
   constructor(public vertexGroup, public colorBufferOffset) {
-    super(0, 0, 0);
     this.opacity = 1.0;
+    this.index = -1;
   }
 
   setR(newR) {
@@ -21,6 +26,22 @@ export default class BufferColor extends Color {
   setB(newB) {
     this.b = newB;
     this.updateColorBuffers(newB, 2);
+  }
+
+  getR(): number {
+    throw new Error('Method not implemented.');
+  }
+
+  getG(): number {
+    throw new Error('Method not implemented.');
+  }
+
+  getB(): number {
+    throw new Error('Method not implemented.');
+  }
+
+  getColor(): string {
+    throw new Error('Method not implemented.');
   }
 
   updateColorBuffers(colorValue, offset) {
@@ -40,10 +61,7 @@ export default class BufferColor extends Color {
   }
 }
 
-
 export class FakeBufferColor extends BufferColor {
-  public index: number = -1;
-
   constructor(public x: number, public y: number) {
     super(null, null);
   }

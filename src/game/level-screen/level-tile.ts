@@ -1,10 +1,9 @@
 import GameEntity from "../../pxlr/core/game-entity";
 import Camera from "./camera";
-import {Coordinate} from "../../pxlr/utils/types";
+import {Color, Coordinate} from "../../pxlr/utils/types";
 import Sprite from "../../pxlr/core/sprite";
 import CellGrid from "../../pxlr/core/cell-grid";
 import {BACKGROUND} from "../../pxlr/utils/layers";
-import Color from "../../pxlr/core/color";
 
 export default class LevelTile extends GameEntity {
 

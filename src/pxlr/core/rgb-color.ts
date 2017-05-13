@@ -1,12 +1,51 @@
-import Color from './color';
+import {Color} from "../utils/types";
 
-export default class RGBColor extends Color {
-  clear: boolean;
+export default class RGBColor implements Color {
+  public index: number = -1;
+  public clear: boolean = false;
+
+  private r: number;
+  private g: number;
+  private b: number;
 
   constructor(r = 0, g = 0, b = 0) {
-    super(r, g, b);
+    this.setR(r);
+    this.setG(g);
+    this.setB(b);
+  }
 
-    this.clear = false;
+  setR(newR): void {
+    this.r = Math.floor(newR) % 256;
+  }
+
+  getR(): number {
+    return this.r;
+  }
+
+  setG(newG): void {
+    this.g = Math.floor(newG) % 256;
+  }
+
+  getG(): number {
+    return this.g;
+  }
+
+  setB(newB): void {
+    this.b = Math.floor(newB) % 256;
+  }
+
+  getB(): number {
+    return this.b;
+  }
+
+  getColor(): string {
+    return `#${this.getR()}${this.getG()}${this.getB()}`;
+  }
+
+  copyFromColor(color: Color): void {
+    this.setR(color.getR());
+    this.setG(color.getG());
+    this.setB(color.getB());
   }
 
   setFromHex(hex: string): void {
@@ -39,7 +78,7 @@ export default class RGBColor extends Color {
     return new RGBColor(this.getR(), this.getG(), this.getB());
   }
 
-  static fromHex(hex): RGBColor {
+  static fromHex(hex: string): RGBColor {
     let color = new RGBColor();
     color.setFromHex(hex);
     return color;

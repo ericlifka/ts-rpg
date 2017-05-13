@@ -1,11 +1,10 @@
 import GameEntity from "../../pxlr/core/game-entity";
-import {Coordinate} from "../../pxlr/utils/types";
+import {Color, Coordinate} from "../../pxlr/utils/types";
 import Camera from "./camera";
 import {CURSOR_SPRITE} from "../sprites/cursor";
 import Sprite from "../../pxlr/core/sprite";
 import CellGrid from "../../pxlr/core/cell-grid";
 import {OVERLAY} from "../../pxlr/utils/layers";
-import Color from "../../pxlr/core/color";
 
 export default class Cursor extends GameEntity {
 

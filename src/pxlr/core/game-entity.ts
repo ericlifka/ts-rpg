@@ -1,5 +1,5 @@
 import CellGrid from "./cell-grid";
-import Color from "./color";
+import {Color} from "../utils/types";
 
 export default class GameEntity {
   children: GameEntity[];
