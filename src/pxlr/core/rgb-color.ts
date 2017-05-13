@@ -35,12 +35,6 @@ export default class RGBColor extends Color {
     this.setB(parseInt(hex.slice(4, 6), 16));
   }
 
-  copyFromColor(color: Color): void {
-    this.setR(color.getR());
-    this.setG(color.getG());
-    this.setB(color.getB());
-  }
-
   clone(): RGBColor {
     return new RGBColor(this.getR(), this.getG(), this.getB());
   }

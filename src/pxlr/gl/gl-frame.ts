@@ -1,5 +1,5 @@
 import CellGrid from '../core/cell-grid';
-import BufferColor from './buffer-color';
+import BufferColor, {FakeBufferColor} from './buffer-color';
 import {Dimension} from "../utils/types";
 
 function pushOntoEnd(target, data) {
@@ -21,7 +21,7 @@ function emptyChunk() {
   };
 }
 
-export default class GlFrame extends CellGrid {
+export default class GlFrame extends CellGrid<BufferColor> {
   gl: any;
   chunks: any;
   fillColor: any = {
@@ -31,7 +31,7 @@ export default class GlFrame extends CellGrid {
   };
 
   constructor(dimensions: Dimension, gl) {
-    super(dimensions);
+    super(dimensions, (x, y) => new FakeBufferColor(x, y));
     this.gl = gl;
 
     this.createBuffers();

@@ -31,6 +31,12 @@ abstract class Color {
   getColor(): string {
     return `#${this.r}${this.g}${this.b}`;
   }
+
+  copyFromColor(color: Color): void {
+    this.setR(color.getR());
+    this.setG(color.getG());
+    this.setB(color.getB());
+  }
 }
 
 export default Color;

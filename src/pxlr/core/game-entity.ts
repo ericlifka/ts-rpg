@@ -1,4 +1,5 @@
 import CellGrid from "./cell-grid";
+import Color from "./color";
 
 export default class GameEntity {
   children: GameEntity[];
@@ -13,7 +14,7 @@ export default class GameEntity {
     });
   }
 
-  render(frame: CellGrid): void {
+  render(frame: CellGrid<Color>): void {
     this.children.forEach(child => {
       child.render(frame);
     });

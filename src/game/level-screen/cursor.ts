@@ -5,6 +5,7 @@ import {CURSOR_SPRITE} from "../sprites/cursor";
 import Sprite from "../../pxlr/core/sprite";
 import CellGrid from "../../pxlr/core/cell-grid";
 import {OVERLAY} from "../../pxlr/utils/layers";
+import Color from "../../pxlr/core/color";
 
 export default class Cursor extends GameEntity {
 
@@ -24,7 +25,7 @@ export default class Cursor extends GameEntity {
     this.calculatePositionCoordinates();
   }
 
-  render(frame: CellGrid): void {
+  render(frame: CellGrid<Color>): void {
     let screenCoord = this.camera.mapToScreenCoord(this.position);
     this.sprite.render(frame, screenCoord, OVERLAY);
   }

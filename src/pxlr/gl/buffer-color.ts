@@ -39,3 +39,16 @@ export default class BufferColor extends Color {
     this.setB(b / 255.0);
   }
 }
+
+
+export class FakeBufferColor extends BufferColor {
+  public index: number = -1;
+
+  constructor(public x: number, public y: number) {
+    super(null, null);
+  }
+  setR(newR) { }
+  setG(newG) { }
+  setB(newB) { }
+  copyFromColor(color) { }
+}

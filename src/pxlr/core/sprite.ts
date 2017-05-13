@@ -1,12 +1,13 @@
 import CellGrid from './cell-grid';
 import RGBColor from './rgb-color';
 import {Coordinate, Dimension} from "../utils/types";
+import Color from "./color";
 
-export default class Sprite extends CellGrid {
+export default class Sprite extends CellGrid<RGBColor> {
   finished: true;
 
   private constructor(public defaultColor = RGBColor, public offsetAdjustment: Coordinate = {x: 0, y: 0}) {
-    super({width: 0, height: 0} as Dimension);
+    super({width: 0, height: 0});
 
     this.cells = null;
   }
@@ -31,17 +32,17 @@ export default class Sprite extends CellGrid {
      */
   }
 
-  render(frame: CellGrid, targetCoord: Coordinate, index = 0) {
+  render(frame: CellGrid<Color>, targetCoord: Coordinate, index = 0) {
     let {x, y} = targetCoord;
     let {x: offset_x, y: offset_y} = this.offsetAdjustment;
 
     this.iterateCells((color, spriteCoord) => {
       if (color && !color.clear) {
         let {x: _x, y: _y} = spriteCoord;
-        let frameColor = frame.cellAt({
+        let frameColor: Color = frame.cellAt({
           x: x + _x + offset_x,
           y: y + _y + offset_y
-        }) as RGBColor;
+        });
 
         if (index >= frameColor.index) {
           frameColor.copyFromColor(color);
