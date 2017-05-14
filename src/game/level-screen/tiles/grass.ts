@@ -8,6 +8,7 @@ import {randomElement} from "../../../pxlr/utils/random";
 
 const SPRITES = [
   emptyGrassSprite,
+  emptyGrassSprite,
   sparseGrassSprite,
   thickGrassSprite
 ];

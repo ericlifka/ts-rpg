@@ -26,6 +26,8 @@ export default class LevelManager extends GameEntity {
     this.addChild(this.camera);
     this.addChild(this.cursor);
 
+    this.buildLevelFromDefinition(emptyFieldLevel);
+
     this.levelDimensions = {width: 10, height: 6};
     this.levelGrid = [];
     for (let x = 0; x < this.levelDimensions.width; x++) {
