@@ -6,13 +6,14 @@ import Cursor from "./cursor";
 import {clamp} from "../../pxlr/utils/clamp";
 import {emptyFieldLevel} from "../level-definitions/empty-field";
 import {LevelDefinition} from "../level-definitions/level-type";
+import CellGrid from "../../pxlr/core/cell-grid";
 
 export default class LevelManager extends GameEntity {
 
   camera: Camera;
   cursor: Cursor;
 
-  levelGrid: LevelTile[][];
+  levelGrid: CellGrid<LevelTile>;
   levelDimensions: Dimension;
 
   movementClear: number = 0;
@@ -22,14 +23,14 @@ export default class LevelManager extends GameEntity {
     super(parent);
 
     this.camera = new Camera(this, dimensions);
-    this.cursor = new Cursor(this, this.camera, {x: emptyFieldLevel.cursorStart.x, y: emptyFieldLevel.cursorStart.y});
+    this.cursor = new Cursor(this, this.camera, emptyFieldLevel.cursorStart);
 
     this.addChild(this.camera);
     this.addChild(this.cursor);
 
     this.buildLevelFromDefinition(emptyFieldLevel);
 
-    this.camera.moveTo(this.levelGrid[emptyFieldLevel.cursorStart.x][emptyFieldLevel.cursorStart.y].center);
+    this.camera.moveTo(this.levelGrid.cellAt(emptyFieldLevel.cursorStart).center);
   }
 
   update(dtime: number, inputs: any[]): void {
@@ -79,10 +80,10 @@ export default class LevelManager extends GameEntity {
 
   private isValidCursorTarget(target: Coordinate): boolean {
     return (
-        target.x === this.cursor.gridPosition.x &&
-        target.y === this.cursor.gridPosition.y
-      ) ||
-      !this.levelGrid[target.x][target.y].border_tile;
+        target.x !== this.cursor.gridPosition.x ||
+        target.y !== this.cursor.gridPosition.y
+      ) &&
+      !this.levelGrid.cellAt(target).border_tile;
   }
 
   private buildLevelFromDefinition(level: LevelDefinition) {
@@ -90,16 +91,17 @@ export default class LevelManager extends GameEntity {
     const width = level.tiles[0].length;
     this.levelDimensions = { width, height };
 
-    this.levelGrid = [];
+    this.levelGrid = new CellGrid<LevelTile>(this.levelDimensions);
+    this.levelGrid.cells = [];
     for (let x = 0; x < width; x++) {
-      this.levelGrid[x] = [];
+      this.levelGrid.cells[x] = [];
 
       for (let y = 0; y < height; y++) {
         /* note: level definitions and the level grid have rows and columns inverted from each other, hence why the
          * lookups are swapped here. */
         let TileType = level.tiles[y][x];
         let tile = new TileType(this, this.camera, {x, y});
-        this.levelGrid[x][y] = tile;
+        this.levelGrid.cells[x][y] = tile;
         this.addChild(tile);
       }
     }
