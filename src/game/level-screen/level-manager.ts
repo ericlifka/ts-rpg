@@ -4,51 +4,32 @@ import {Coordinate, Dimension} from "../../pxlr/utils/types";
 import LevelTile from "./level-tile";
 import Cursor from "./cursor";
 import {clamp} from "../../pxlr/utils/clamp";
-import GrassTile from "./tiles/grass";
-import WoodsTile from "./tiles/woods";
+import {emptyFieldLevel} from "../level-definitions/empty-field";
+import {LevelDefinition} from "../level-definitions/level-type";
 
 export default class LevelManager extends GameEntity {
 
   camera: Camera;
   cursor: Cursor;
+
   levelGrid: LevelTile[][];
-  movementClear: number = 0;
   levelDimensions: Dimension;
 
+  movementClear: number = 0;
   movementDelay: number = 325;
 
   constructor(parent, public dimensions: Dimension) {
     super(parent);
 
     this.camera = new Camera(this, dimensions);
-    this.cursor = new Cursor(this, this.camera, {x: 1, y: 1});
+    this.cursor = new Cursor(this, this.camera, {x: emptyFieldLevel.cursorStart.x, y: emptyFieldLevel.cursorStart.y});
 
     this.addChild(this.camera);
     this.addChild(this.cursor);
 
     this.buildLevelFromDefinition(emptyFieldLevel);
 
-    this.levelDimensions = {width: 10, height: 6};
-    this.levelGrid = [];
-    for (let x = 0; x < this.levelDimensions.width; x++) {
-      this.levelGrid[x] = [];
-
-      for (let y = 0; y < this.levelDimensions.height; y++) {
-
-
-        let tile;
-        if (x === 0 || y === 0 || x === this.levelDimensions.width - 1 || y === this.levelDimensions.height - 1) {
-          tile = new WoodsTile(this, this.camera, {x, y});
-        } else {
-          tile = new GrassTile(this, this.camera, {x, y});
-        }
-
-        this.addChild(tile);
-        this.levelGrid[x][y] = tile;
-      }
-    }
-
-    this.camera.moveTo(this.levelGrid[1][1].center);
+    this.camera.moveTo(this.levelGrid[emptyFieldLevel.cursorStart.x][emptyFieldLevel.cursorStart.y].center);
   }
 
   update(dtime: number, inputs: any[]): void {
@@ -96,11 +77,31 @@ export default class LevelManager extends GameEntity {
     }
   }
 
-  isValidCursorTarget(target: Coordinate): boolean {
+  private isValidCursorTarget(target: Coordinate): boolean {
     return (
         target.x === this.cursor.gridPosition.x &&
         target.y === this.cursor.gridPosition.y
       ) ||
       !this.levelGrid[target.x][target.y].border_tile;
+  }
+
+  private buildLevelFromDefinition(level: LevelDefinition) {
+    const height = level.tiles.length;
+    const width = level.tiles[0].length;
+    this.levelDimensions = { width, height };
+
+    this.levelGrid = [];
+    for (let x = 0; x < width; x++) {
+      this.levelGrid[x] = [];
+
+      for (let y = 0; y < height; y++) {
+        /* note: level definitions and the level grid have rows and columns inverted from each other, hence why the
+         * lookups are swapped here. */
+        let TileType = level.tiles[y][x];
+        let tile = new TileType(this, this.camera, {x, y});
+        this.levelGrid[x][y] = tile;
+        this.addChild(tile);
+      }
+    }
   }
 }
