@@ -1,6 +1,6 @@
 import CellGrid from './cell-grid';
 import RGBColor from './rgb-color';
-import {Color, Coordinate, Dimension} from "../utils/types";
+import {Color, Coordinate, Dimension, copyDimension} from "../utils/types";
 
 export default class Sprite extends CellGrid<RGBColor> {
   finished: true;
@@ -63,8 +63,7 @@ export default class Sprite extends CellGrid<RGBColor> {
     let {x, y} = this.offsetAdjustment;
     let sprite = new Sprite(this.defaultColor, {x, y});
     sprite.cells = colorGrid;
-    sprite.dimensions.width = this.dimensions.width;
-    sprite.dimensions.height = this.dimensions.height;
+    sprite.dimensions = copyDimension(this.dimensions);
 
     return sprite;
   }
@@ -86,8 +85,10 @@ export default class Sprite extends CellGrid<RGBColor> {
       }
     }
 
-    this.dimensions.width = height;
-    this.dimensions.height = width;
+    this.dimensions = {
+      width: height,
+      height: width
+    };
     this.cells = newCells;
 
     return this;

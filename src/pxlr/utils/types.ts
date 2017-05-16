@@ -3,8 +3,8 @@ export type Coordinate = {
   y: number
 };
 export type Dimension = {
-  width: number,
-  height: number
+  readonly width: number,
+  readonly height: number
 };
 export interface Color {
   index: number;
@@ -19,4 +19,11 @@ export interface Color {
 
   getColor(): string;
   copyFromColor(c: Color): void;
+}
+
+export function copyCoord(target: Coordinate): Coordinate {
+  return { x: target.x, y: target.y };
+}
+export function copyDimension(target: Dimension): Dimension {
+  return { width: target.width, height: target.height };
 }

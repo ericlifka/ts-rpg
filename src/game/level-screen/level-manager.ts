@@ -7,6 +7,7 @@ import {clamp} from "../../pxlr/utils/clamp";
 import {emptyFieldLevel} from "../level-definitions/empty-field";
 import {LevelDefinition} from "../level-definitions/level-type";
 import CellGrid from "../../pxlr/core/cell-grid";
+import Character from "./entities/character";
 
 export default class LevelManager extends GameEntity {
 
@@ -19,6 +20,8 @@ export default class LevelManager extends GameEntity {
   movementClear: number = 0;
   movementDelay: number = 325;
 
+  sampleCharacter: Character;
+
   constructor(parent, public dimensions: Dimension) {
     super(parent);
 
@@ -30,7 +33,12 @@ export default class LevelManager extends GameEntity {
 
     this.buildLevelFromDefinition(emptyFieldLevel);
 
-    this.camera.moveTo(this.levelGrid.cellAt(emptyFieldLevel.cursorStart).center);
+    let startPosition = this.levelGrid.cellAt(emptyFieldLevel.cursorStart);
+    this.camera.moveTo(startPosition.center);
+
+    this.sampleCharacter = new Character(this, this.camera);
+    this.addChild(this.sampleCharacter);
+    this.sampleCharacter.moveToTile(startPosition);
   }
 
   update(dtime: number, inputs: any[]): void {
