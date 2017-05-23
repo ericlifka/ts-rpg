@@ -42,13 +42,6 @@ export default class LevelManager extends GameEntity {
     this.sampleCharacter = new Character(this, this.camera, swordGirlSprite());
     this.addChild(this.sampleCharacter);
     this.sampleCharacter.moveToTile(startPosition);
-
-    this.sampleCharacter2 = new Character(this, this.camera, princessSprite());
-    this.addChild(this.sampleCharacter2);
-    this.sampleCharacter2.moveToTile(this.levelGrid.cellAt({
-      x: emptyFieldLevel.cursorStart.x + 1,
-      y: emptyFieldLevel.cursorStart.y
-    }));
   }
 
   update(dtime: number, inputs: any[]): void {
