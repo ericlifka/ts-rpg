@@ -29,7 +29,6 @@ export default class LevelTile extends GameEntity {
   }
 
   render(frame: CellGrid<Color>): void {
-    let screenCoord = this.camera.mapToScreenCoord(this.position);
-    this.sprite.render(frame, screenCoord, BACKGROUND);
+    this.camera.renderAdjustedEntity(frame, this.sprite, this.position, BACKGROUND);
   }
 }

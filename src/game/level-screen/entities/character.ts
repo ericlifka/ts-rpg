@@ -20,7 +20,6 @@ export default class Character extends GameEntity {
   }
 
   render(frame: CellGrid<Color>): void {
-    let screenCoord = this.camera.mapToScreenCoord(this.position);
-    this.sprite.render(frame, screenCoord, CHARACTER);
+    this.camera.renderAdjustedEntity(frame, this.sprite, this.position, CHARACTER);
   }
 }

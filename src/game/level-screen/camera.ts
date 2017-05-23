@@ -1,5 +1,7 @@
 import GameEntity from "../../pxlr/core/game-entity";
-import {Coordinate, Dimension} from "../../pxlr/utils/types";
+import {Color, Coordinate, Dimension} from "../../pxlr/utils/types";
+import CellGrid from "../../pxlr/core/cell-grid";
+import Sprite from "../../pxlr/core/sprite";
 
 export default class Camera extends GameEntity {
 
@@ -49,11 +51,18 @@ export default class Camera extends GameEntity {
     };
   }
 
+  isSpriteVisible(coord: Coordinate, dimension: Dimension) {
+    return coord.x + dimension.width >= 0 &&
+      coord.x <= this.dimensions.width &&
+      coord.y + dimension.height >= 0 &&
+      coord.y <= this.dimensions.height;
+  }
+
   animateTo(coord: Coordinate, time: number) {
     this.animationActive = true;
     this.animationCounter = 0;
     this.animationEnd = time;
-    this.animationStartPosition = { x: this.position.x, y: this.position.y };
+    this.animationStartPosition = {x: this.position.x, y: this.position.y};
     this.animationEndPosition = coord;
     this.animationDelta = {
       x: this.animationEndPosition.x - this.animationStartPosition.x,
@@ -64,5 +73,12 @@ export default class Camera extends GameEntity {
   moveTo(coord: Coordinate): void {
     this.position.x = coord.x;
     this.position.y = coord.y;
+  }
+
+  renderAdjustedEntity(frame: CellGrid<Color>, sprite: Sprite, position: Coordinate, layer: number) {
+    let coord = this.mapToScreenCoord(position);
+    if (this.isSpriteVisible(coord, sprite.dimensions)) {
+      sprite.render(frame, coord, layer);
+    }
   }
 }
