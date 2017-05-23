@@ -17,13 +17,6 @@ export default class Sprite extends CellGrid<RGBColor> {
     return this;
   }
 
-  applyColor(colorCode) {
-    this.iterateCells((color, coord) =>
-      color.setFromHex(colorCode));
-
-    return this;
-  }
-
   update(dtime) {
     /*
      sprites ignore updates by default, but accept the event
@@ -51,7 +44,7 @@ export default class Sprite extends CellGrid<RGBColor> {
     });
   }
 
-  clone() {
+  clone(): Sprite {
     let colorGrid = [];
     for (let x = 0; x < this.dimensions.width; x++) {
       colorGrid[x] = [];
@@ -66,59 +59,6 @@ export default class Sprite extends CellGrid<RGBColor> {
     sprite.dimensions = copyDimension(this.dimensions);
 
     return sprite;
-  }
-
-  rotateLeft() {
-    let width = this.dimensions.width;
-    let height = this.dimensions.height;
-    let oldCells = this.cells;
-    let newCells = [];
-    let x, y;
-
-    for (x = 0; x < height; x++) {
-      newCells[x] = [];
-    }
-
-    for (x = 0; x < width; x++) {
-      for (y = 0; y < height; y++) {
-        newCells[y][width - x - 1] = oldCells[x][y];
-      }
-    }
-
-    this.dimensions = {
-      width: height,
-      height: width
-    };
-    this.cells = newCells;
-
-    return this;
-  }
-
-  rotateRight() {
-    return this
-      .rotateLeft()
-      .rotateLeft()
-      .rotateLeft();
-  }
-
-  invertX() {
-    for (let x = 0; x < this.dimensions.width / 2; x++) {
-      let left = this.cells[x];
-      let right = this.cells[this.dimensions.width - x - 1];
-
-      this.cells[x] = right;
-      this.cells[this.dimensions.width - x - 1] = left;
-    }
-
-    return this;
-  }
-
-  invertY() {
-    for (let x = 0; x < this.dimensions.width; x++) {
-      this.cells[x].reverse();
-    }
-
-    return this;
   }
 
   private _buildEmptySheet(dimensions: Dimension) {
@@ -151,4 +91,64 @@ export default class Sprite extends CellGrid<RGBColor> {
 
     return sprite;
   }
+
+  // applyColor(colorCode) {
+  //   this.iterateCells((color, coord) =>
+  //     color.setFromHex(colorCode));
+  //
+  //   return this;
+  // }
+  //
+  // rotateLeft() {
+  //   let width = this.dimensions.width;
+  //   let height = this.dimensions.height;
+  //   let oldCells = this.cells;
+  //   let newCells = [];
+  //   let x, y;
+  //
+  //   for (x = 0; x < height; x++) {
+  //     newCells[x] = [];
+  //   }
+  //
+  //   for (x = 0; x < width; x++) {
+  //     for (y = 0; y < height; y++) {
+  //       newCells[y][width - x - 1] = oldCells[x][y];
+  //     }
+  //   }
+  //
+  //   this.dimensions = {
+  //     width: height,
+  //     height: width
+  //   };
+  //   this.cells = newCells;
+  //
+  //   return this;
+  // }
+  //
+  // rotateRight() {
+  //   return this
+  //     .rotateLeft()
+  //     .rotateLeft()
+  //     .rotateLeft();
+  // }
+  //
+  // invertX() {
+  //   for (let x = 0; x < this.dimensions.width / 2; x++) {
+  //     let left = this.cells[x];
+  //     let right = this.cells[this.dimensions.width - x - 1];
+  //
+  //     this.cells[x] = right;
+  //     this.cells[this.dimensions.width - x - 1] = left;
+  //   }
+  //
+  //   return this;
+  // }
+  //
+  // invertY() {
+  //   for (let x = 0; x < this.dimensions.width; x++) {
+  //     this.cells[x].reverse();
+  //   }
+  //
+  //   return this;
+  // }
 }

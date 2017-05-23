@@ -8,8 +8,7 @@ import {emptyFieldLevel} from "../level-definitions/empty-field";
 import {LevelDefinition} from "../level-definitions/level-type";
 import CellGrid from "../../pxlr/core/cell-grid";
 import Character from "./entities/character";
-import {createSprite as swordGirlSprite} from '../sprites/chatacters/sword-girl';
-import {createSprite as princessSprite} from '../sprites/chatacters/princess';
+import {SWORD_GIRL_CHARACTER_SPRITE} from '../sprites/chatacters/sword-girl';
 
 export default class LevelManager extends GameEntity {
 
@@ -39,7 +38,7 @@ export default class LevelManager extends GameEntity {
     let startPosition = this.levelGrid.cellAt(emptyFieldLevel.cursorStart);
     this.camera.moveTo(startPosition.center);
 
-    this.sampleCharacter = new Character(this, this.camera, swordGirlSprite());
+    this.sampleCharacter = new Character(this, this.camera, SWORD_GIRL_CHARACTER_SPRITE);
     this.addChild(this.sampleCharacter);
     this.sampleCharacter.moveToTile(startPosition);
   }

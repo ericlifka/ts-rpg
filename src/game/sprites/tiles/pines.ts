@@ -11,6 +11,4 @@ const IMPORTED_SPRITE_DATA = {
 
 const pixels: string[][] = IMPORTED_SPRITE_DATA.frames[0];
 
-export function createSprite(): Sprite {
-  return Sprite.newFromColorSheet(pixels);
-}
+export const PINES_TILE_SPRITE = Sprite.newFromColorSheet(pixels);
