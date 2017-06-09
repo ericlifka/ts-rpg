@@ -7,6 +7,8 @@ import {BACKGROUND} from "../../pxlr/utils/layers";
 
 export default class LevelTile extends GameEntity {
 
+  containedEntity: GameEntity;
+
   center: Coordinate;
   position: Coordinate;
   tileSize: number;
@@ -30,5 +32,13 @@ export default class LevelTile extends GameEntity {
 
   render(frame: CellGrid<Color>): void {
     this.camera.renderAdjustedEntity(frame, this.sprite, this.position, BACKGROUND);
+  }
+
+  addEntityToTile(entity: GameEntity) {
+    this.containedEntity = entity;
+  }
+
+  clearEntityFromTile() {
+    this.containedEntity = null;
   }
 }

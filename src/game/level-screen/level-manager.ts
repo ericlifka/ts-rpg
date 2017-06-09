@@ -22,7 +22,6 @@ export default class LevelManager extends GameEntity {
   movementDelay: number = 325;
 
   sampleCharacter: Character;
-  sampleCharacter2: Character;
 
   constructor(parent, public dimensions: Dimension) {
     super(parent);

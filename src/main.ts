@@ -5,10 +5,10 @@ import KeyboardInput from "./pxlr/controllers/keyboard-input";
 import GamepadInput from "./pxlr/controllers/gamepad-input";
 import {Dimension} from "./pxlr/utils/types";
 
-const dimensions = {
+const dimensions: Dimension = {
   width: 250,
   height: 150
-} as Dimension;
+};
 
 const game = new Game(dimensions);
 const renderer = new WebGL(dimensions);
@@ -44,3 +44,6 @@ window.addEventListener("focus", function () {
   inputs.forEach(input => input.clearState());
   runLoop.start();
 });
+
+window['$game'] = game;
+window['$runloop'] = runLoop;

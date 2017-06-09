@@ -16,6 +16,7 @@ export default class Character extends GameEntity {
   }
 
   moveToTile(tile: LevelTile) {
+    tile.addEntityToTile(this);
     this.position = addCoords(tile.position, this.displayOffset);
   }
 
