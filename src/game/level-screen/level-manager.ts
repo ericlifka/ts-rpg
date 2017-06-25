@@ -66,28 +66,20 @@ export default class LevelManager extends GameEntity {
         direction.x += 1;
       }
 
-      let newPosition = {
-        x: clamp(this.cursor.gridPosition.x + direction.x, 0, this.levelDimensions.width - 1),
-        y: clamp(this.cursor.gridPosition.y + direction.y, 0, this.levelDimensions.height - 1)
-      };
+      let newTile: LevelTile = this.levelGrid.cellAt({
+        x: this.cursor.gridPosition.x + direction.x,
+        y: this.cursor.gridPosition.y + direction.y
+      });
 
-      if (this.isValidCursorTarget(newPosition)) {
+      if (newTile && newTile !== this.cursor.activeTile && !newTile.border_tile) {
         this.movementClear = -this.movementDelay;
-        this.cursor.moveTo(newPosition);
+        this.cursor.moveTo(newTile);
         this.camera.animateTo(this.cursor.center, this.movementDelay);
       }
 
     } else if (!input.W && !input.A && !input.S && !input.D) {
       this.movementClear = 1;
     }
-  }
-
-  private isValidCursorTarget(target: Coordinate): boolean {
-    return (
-        target.x !== this.cursor.gridPosition.x ||
-        target.y !== this.cursor.gridPosition.y
-      ) &&
-      !this.levelGrid.cellAt(target).border_tile;
   }
 
   private buildLevelFromDefinition(level: LevelDefinition) {
