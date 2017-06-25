@@ -9,10 +9,14 @@ import {CHARACTER} from "../../../pxlr/utils/layers";
 export default class Character extends GameEntity {
   position: Coordinate;
   displayOffset: Coordinate;
+  highlightSprite: Sprite;
+
+  active: boolean = false;
 
   constructor(parent, public camera: Camera, public sprite: Sprite) {
     super(parent);
     this.displayOffset = {x: 10, y: 7};
+    this.highlightSprite = Sprite.createHighlight(this.sprite);
   }
 
   moveToTile(tile: LevelTile) {
@@ -21,10 +25,13 @@ export default class Character extends GameEntity {
   }
 
   render(frame: CellGrid<Color>): void {
-    this.camera.renderAdjustedEntity(frame, this.sprite, this.position, CHARACTER);
+    // this.camera.renderAdjustedEntity(frame, this.sprite, this.position, CHARACTER);
+    this.camera.renderAdjustedEntity(frame, this.highlightSprite, this.position, CHARACTER);
   }
 
   toggleActive() {
     console.log("TOGGLE ACTIVE");
+
+    this.active = !this.active;
   }
 }

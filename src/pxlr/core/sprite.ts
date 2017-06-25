@@ -73,7 +73,7 @@ export default class Sprite extends CellGrid<RGBColor> {
     }
   }
 
-  public static newFromColorSheet(pixels: string[][]) {
+  public static newFromColorSheet(pixels: string[][]): Sprite {
     let dimensions = {
       width: pixels[0].length,
       height: pixels.length
@@ -84,10 +84,24 @@ export default class Sprite extends CellGrid<RGBColor> {
 
     for (let h = 0; h < dimensions.height; h++) {
       for (let w = 0; w < dimensions.width; w++) {
-        let color = sprite.cellAt({x: w, y: dimensions.height - h - 1}) as RGBColor;
+        let color = sprite.cellAt({x: w, y: dimensions.height - h - 1});
         color.setFromHex(pixels[h][w]);
       }
     }
+
+    return sprite;
+  }
+
+  public static createHighlight(template: Sprite): Sprite {
+    let dimensions = {
+      width: template.dimensions.width + 2,
+      height: template.dimensions.height + 2
+    };
+
+    let sprite = new Sprite();
+    sprite._buildEmptySheet(dimensions);
+
+    template.render(sprite, {x: 0, y: 0}, 10);
 
     return sprite;
   }
