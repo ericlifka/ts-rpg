@@ -10,6 +10,8 @@ import CellGrid from "../../pxlr/core/cell-grid";
 import Character from "./entities/character";
 import {SWORD_GIRL_CHARACTER_SPRITE} from '../sprites/chatacters/sword-girl';
 
+const KEYBOARD = 0;
+
 export default class LevelManager extends GameEntity {
 
   camera: Camera;
@@ -45,45 +47,38 @@ export default class LevelManager extends GameEntity {
   update(dtime: number, inputs: any[]): void {
     super.update(dtime, inputs);
 
+    let input = inputs[KEYBOARD];
+
     this.movementClear += dtime;
     if (this.movementClear > 0) {
-      inputs.forEach(input => {
-        if (input.INPUT_TYPE === "keyboard") {
 
-          let direction: Coordinate = {x: 0, y: 0};
-          if (input.W) {
-            direction.y += 1;
-          }
-          if (input.A) {
-            direction.x -= 1;
-          }
-          if (input.S) {
-            direction.y -= 1;
-          }
-          if (input.D) {
-            direction.x += 1;
-          }
+      let direction: Coordinate = {x: 0, y: 0};
+      if (input.W) {
+        direction.y += 1;
+      }
+      if (input.A) {
+        direction.x -= 1;
+      }
+      if (input.S) {
+        direction.y -= 1;
+      }
+      if (input.D) {
+        direction.x += 1;
+      }
 
-          let newPosition = {
-            x: clamp(this.cursor.gridPosition.x + direction.x, 0, this.levelDimensions.width - 1),
-            y: clamp(this.cursor.gridPosition.y + direction.y, 0, this.levelDimensions.height - 1)
-          };
+      let newPosition = {
+        x: clamp(this.cursor.gridPosition.x + direction.x, 0, this.levelDimensions.width - 1),
+        y: clamp(this.cursor.gridPosition.y + direction.y, 0, this.levelDimensions.height - 1)
+      };
 
-          if (this.isValidCursorTarget(newPosition)) {
-            this.movementClear = -this.movementDelay;
-            this.cursor.moveTo(newPosition);
-            this.camera.animateTo(this.cursor.center, this.movementDelay);
-          }
-        }
-      });
-    } else {
-      inputs.forEach(input => {
-        if (input.INPUT_TYPE === "keyboard") {
-          if (!input.W && !input.A && !input.S && !input.D) {
-            this.movementClear = 1;
-          }
-        }
-      });
+      if (this.isValidCursorTarget(newPosition)) {
+        this.movementClear = -this.movementDelay;
+        this.cursor.moveTo(newPosition);
+        this.camera.animateTo(this.cursor.center, this.movementDelay);
+      }
+
+    } else if (!input.W && !input.A && !input.S && !input.D) {
+      this.movementClear = 1;
     }
   }
 
@@ -98,7 +93,7 @@ export default class LevelManager extends GameEntity {
   private buildLevelFromDefinition(level: LevelDefinition) {
     const height = level.tiles.length;
     const width = level.tiles[0].length;
-    this.levelDimensions = { width, height };
+    this.levelDimensions = {width, height};
 
     this.levelGrid = new CellGrid<LevelTile>(this.levelDimensions);
     this.levelGrid.cells = [];
