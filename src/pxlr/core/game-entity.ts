@@ -32,4 +32,12 @@ export default class GameEntity {
       this.children.splice(index, 1);
     }
   }
+
+  sendEvent(event: string, ...args) {
+    if (this[event] && typeof this[event] === "function") {
+      return this[event](...args);
+    } else {
+      console.error(new Error(`Couldn't find ${event} on entity ${this}`));
+    }
+  }
 }

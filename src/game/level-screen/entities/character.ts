@@ -3,7 +3,7 @@ import Sprite from "../../../pxlr/core/sprite";
 import LevelTile from "../level-tile";
 import Camera from "../camera";
 import CellGrid from "../../../pxlr/core/cell-grid";
-import {addCoords, Color, Coordinate, copyCoord} from "../../../pxlr/utils/types";
+import {addCoords, Color, Coordinate} from "../../../pxlr/utils/types";
 import {CHARACTER} from "../../../pxlr/utils/layers";
 
 export default class Character extends GameEntity {
@@ -12,7 +12,7 @@ export default class Character extends GameEntity {
 
   constructor(parent, public camera: Camera, public sprite: Sprite) {
     super(parent);
-    this.displayOffset = { x: 10, y: 7 };
+    this.displayOffset = {x: 10, y: 7};
   }
 
   moveToTile(tile: LevelTile) {
@@ -22,5 +22,9 @@ export default class Character extends GameEntity {
 
   render(frame: CellGrid<Color>): void {
     this.camera.renderAdjustedEntity(frame, this.sprite, this.position, CHARACTER);
+  }
+
+  toggleActive() {
+    console.log("TOGGLE ACTIVE");
   }
 }

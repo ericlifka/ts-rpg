@@ -3,7 +3,6 @@ import Camera from "./camera";
 import {Coordinate, Dimension} from "../../pxlr/utils/types";
 import LevelTile from "./level-tile";
 import Cursor from "./cursor";
-import {clamp} from "../../pxlr/utils/clamp";
 import {emptyFieldLevel} from "../level-definitions/empty-field";
 import {LevelDefinition} from "../level-definitions/level-type";
 import CellGrid from "../../pxlr/core/cell-grid";
@@ -22,6 +21,7 @@ export default class LevelManager extends GameEntity {
 
   movementClear: number = 0;
   movementDelay: number = 325;
+  selectActive: boolean = false;
 
   sampleCharacter: Character;
 
@@ -48,6 +48,17 @@ export default class LevelManager extends GameEntity {
     super.update(dtime, inputs);
 
     let input = inputs[KEYBOARD];
+
+    if (!this.selectActive) {
+      if (input.ENTER) {
+        this.selectActive = true;
+        this.selectCursorLocation();
+      }
+    } else {
+      if (!input.ENTER) {
+        this.selectActive = false;
+      }
+    }
 
     this.movementClear += dtime;
     if (this.movementClear > 0) {
@@ -100,6 +111,13 @@ export default class LevelManager extends GameEntity {
         this.levelGrid.cells[x][y] = tile;
         this.addChild(tile);
       }
+    }
+  }
+
+  selectCursorLocation() {
+    let entity = this.cursor.activeTile.containedEntity;
+    if (entity) {
+      entity.sendEvent('toggleActive');
     }
   }
 }
