@@ -16,7 +16,7 @@ export default class Character extends GameEntity {
 
   constructor(parent, public camera: Camera, public sprite: Sprite) {
     super(parent);
-    this.displayOffset = {x: 10, y: 7};
+    this.displayOffset = {x: 9, y: 6};
     this.highlightSprite = Sprite.createHighlight(this.sprite);
   }
 
@@ -27,13 +27,13 @@ export default class Character extends GameEntity {
   }
 
   render(frame: CellGrid<Color>): void {
-    this.camera.renderAdjustedEntity(frame, this.highlightSprite, this.position, CHARACTER);
+    if (this.active) {
+      this.camera.renderAdjustedEntity(frame, this.highlightSprite, this.position, CHARACTER);
+    }
     this.camera.renderAdjustedEntity(frame, this.sprite, this.highlightPosition, CHARACTER);
   }
 
   toggleActive() {
-    console.log("TOGGLE ACTIVE");
-
     this.active = !this.active;
   }
 }
