@@ -36,7 +36,7 @@ export default class Sprite extends CellGrid<RGBColor> {
           y: y + _y + offset_y
         });
 
-        if (index >= frameColor.index) {
+        if (frameColor && index >= frameColor.index) {
           frameColor.copyFromColor(color);
           frameColor.index = index;
         }
@@ -102,17 +102,28 @@ export default class Sprite extends CellGrid<RGBColor> {
     let sprite = new Sprite();
     sprite._buildEmptySheet(dimensions);
 
+    template.render(sprite, {x: 1, y: 0}, 10);
+    template.render(sprite, {x: 1, y: 2}, 10);
+    template.render(sprite, {x: 0, y: 1}, 10);
+    template.render(sprite, {x: 2, y: 1}, 10);
     template.render(sprite, {x: 0, y: 0}, 10);
+    template.render(sprite, {x: 2, y: 2}, 10);
+    template.render(sprite, {x: 2, y: 0}, 10);
+    template.render(sprite, {x: 0, y: 2}, 10);
+
+    sprite.applyColor(new RGBColor(255, 255, 255));
 
     return sprite;
   }
 
-  // applyColor(colorCode) {
-  //   this.iterateCells((color, coord) =>
-  //     color.setFromHex(colorCode));
-  //
-  //   return this;
-  // }
+  applyColor(color) {
+    this.iterateCells(cell => {
+      if (!cell.clear) {
+        cell.copyFromColor(color);
+      }
+    });
+  }
+
   //
   // rotateLeft() {
   //   let width = this.dimensions.width;

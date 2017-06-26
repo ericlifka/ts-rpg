@@ -8,6 +8,7 @@ import {CHARACTER} from "../../../pxlr/utils/layers";
 
 export default class Character extends GameEntity {
   position: Coordinate;
+  highlightPosition: Coordinate;
   displayOffset: Coordinate;
   highlightSprite: Sprite;
 
@@ -22,11 +23,12 @@ export default class Character extends GameEntity {
   moveToTile(tile: LevelTile) {
     tile.addEntityToTile(this);
     this.position = addCoords(tile.position, this.displayOffset);
+    this.highlightPosition = addCoords(this.position, {x: 1, y: 1});
   }
 
   render(frame: CellGrid<Color>): void {
-    // this.camera.renderAdjustedEntity(frame, this.sprite, this.position, CHARACTER);
     this.camera.renderAdjustedEntity(frame, this.highlightSprite, this.position, CHARACTER);
+    this.camera.renderAdjustedEntity(frame, this.sprite, this.highlightPosition, CHARACTER);
   }
 
   toggleActive() {
