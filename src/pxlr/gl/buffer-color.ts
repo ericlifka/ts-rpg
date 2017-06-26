@@ -3,6 +3,7 @@ import {Color} from "../utils/types";
 export default class BufferColor implements Color {
   public index: number;
   public opacity: number;
+  public clear: boolean = false;
 
   private r: number = 0;
   private g: number = 0;

@@ -68,7 +68,8 @@ export default class Sprite extends CellGrid<RGBColor> {
     for (let x = 0; x < dimensions.width; x++) {
       this.cells[x] = [];
       for (let y = 0; y < dimensions.height; y++) {
-        this.cells[x][y] = new this.defaultColor(0, 0, 0);
+        this.cells[x][y] = new this.defaultColor();
+        this.cells[x][y].setFromHex(null);
       }
     }
   }

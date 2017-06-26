@@ -43,6 +43,7 @@ export default class RGBColor implements Color {
   }
 
   copyFromColor(color: Color): void {
+    this.clear = color.clear;
     this.setR(color.getR());
     this.setG(color.getG());
     this.setB(color.getB());
@@ -72,6 +73,7 @@ export default class RGBColor implements Color {
     this.setR(parseInt(hex.slice(0, 2), 16));
     this.setG(parseInt(hex.slice(2, 4), 16));
     this.setB(parseInt(hex.slice(4, 6), 16));
+    this.clear = false;
   }
 
   clone(): RGBColor {

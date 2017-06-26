@@ -8,6 +8,7 @@ export type Dimension = {
 };
 export interface Color {
   index: number;
+  clear: boolean;
 
   setR(r: number): void;
   setG(g: number): void;
