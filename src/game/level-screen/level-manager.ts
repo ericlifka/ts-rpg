@@ -6,7 +6,7 @@ import Cursor from "./cursor";
 import {emptyFieldLevel} from "../level-definitions/empty-field";
 import {LevelDefinition} from "../level-definitions/level-type";
 import CellGrid from "../../pxlr/core/cell-grid";
-import Character from "./entities/character";
+import Character from "./entities/unit";
 import {SWORD_GIRL_CHARACTER_SPRITE} from '../sprites/chatacters/sword-girl';
 
 const KEYBOARD = 0;
@@ -119,5 +119,16 @@ export default class LevelManager extends GameEntity {
     if (entity) {
       entity.sendEvent('toggleActive');
     }
+  }
+
+  showMovementTemplateForUnit(unitEntity: Character) {
+    let center = unitEntity.position;
+    let distance = unitEntity.model.movement;
+    /* do stuff */
+    console.log('showing movement template');
+  }
+
+  clearMovementTemplates() {
+    console.log('clearing movement template');
   }
 }

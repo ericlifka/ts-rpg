@@ -5,6 +5,7 @@ import Camera from "../camera";
 import CellGrid from "../../../pxlr/core/cell-grid";
 import {addCoords, Color, Coordinate} from "../../../pxlr/utils/types";
 import {CHARACTER} from "../../../pxlr/utils/layers";
+import {Unit} from "../../models/unit";
 
 export default class Character extends GameEntity {
   position: Coordinate;
@@ -14,10 +15,16 @@ export default class Character extends GameEntity {
 
   active: boolean = false;
 
+  model: Unit;
+
   constructor(parent, public camera: Camera, public sprite: Sprite) {
     super(parent);
     this.displayOffset = {x: 9, y: 6};
     this.highlightSprite = Sprite.createHighlight(this.sprite);
+
+    this.model = {
+      movement: 3
+    };
   }
 
   moveToTile(tile: LevelTile) {
@@ -35,5 +42,11 @@ export default class Character extends GameEntity {
 
   toggleActive() {
     this.active = !this.active;
+
+    if (this.active) {
+      this.parent.sendEvent('showMovementTemplateForUnit', this);
+    } else {
+      this.parent.sendEvent('clearMovementTemplates');
+    }
   }
 }
