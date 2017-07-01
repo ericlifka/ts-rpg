@@ -4,6 +4,8 @@ import {Color, Coordinate} from "../../pxlr/utils/types";
 import Sprite from "../../pxlr/core/sprite";
 import CellGrid from "../../pxlr/core/cell-grid";
 import {BACKGROUND} from "../../pxlr/utils/layers";
+import {BORDER_BOTTOM, BORDER_LEFT, BORDER_RIGHT, BORDER_TOP} from "../sprites/interface/highlight-borders";
+
 
 export default class LevelTile extends GameEntity {
 
@@ -32,6 +34,10 @@ export default class LevelTile extends GameEntity {
 
   render(frame: CellGrid<Color>): void {
     this.camera.renderAdjustedEntity(frame, this.sprite, this.position, BACKGROUND);
+    this.camera.renderAdjustedEntity(frame, BORDER_TOP, this.position, BACKGROUND);
+    this.camera.renderAdjustedEntity(frame, BORDER_RIGHT, this.position, BACKGROUND);
+    this.camera.renderAdjustedEntity(frame, BORDER_BOTTOM, this.position, BACKGROUND);
+    this.camera.renderAdjustedEntity(frame, BORDER_LEFT, this.position, BACKGROUND);
   }
 
   addEntityToTile(entity: GameEntity) {
