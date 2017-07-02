@@ -1,6 +1,6 @@
 import GameEntity from "../../pxlr/core/game-entity";
 import Camera from "./camera";
-import {Coordinate, Dimension} from "../../pxlr/utils/types";
+import {Coordinate, coordNeighbors, Dimension} from "../../pxlr/utils/types";
 import LevelTile from "./level-tile";
 import Cursor from "./cursor";
 import {emptyFieldLevel} from "../level-definitions/empty-field";
@@ -125,14 +125,37 @@ export default class LevelManager extends GameEntity {
     let center = unitEntity.containingTile.gridPosition;
     let distance = unitEntity.model.movement;
 
-    /* do stuff */
-    console.log('showing movement template');
-    let centerTile = this.levelGrid.cellAt(center);
-    centerTile.showHighlightBorders = true;
+    let queue = [ {
+      coord: center,
+      remainingMove: distance
+    } ];
+
+    const visitTile = () => {
+      let next = queue.shift();
+      let tile = this.levelGrid.cellAt(next.coord);
+
+      if (tile && !tile.showHighlightBorders && !tile.border_tile) {
+        tile.showHighlightBorders = true;
+        if (next.remainingMove > 0) {
+          let neighbors = coordNeighbors(next.coord);
+          neighbors.forEach((coord: Coordinate) => {
+            queue.push({
+              coord,
+              remainingMove: next.remainingMove - 1
+            });
+          });
+        }
+      }
+
+      if (queue.length > 0) {
+        visitTile();
+      }
+    };
+
+    visitTile();
   }
 
   clearMovementTemplates() {
-    console.log('clearing movement template');
     this.levelGrid.iterateCells((tile: LevelTile) => {
       tile.showHighlightBorders = false;
     });
