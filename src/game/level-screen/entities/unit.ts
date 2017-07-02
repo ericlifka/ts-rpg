@@ -12,6 +12,7 @@ export default class Character extends GameEntity {
   highlightPosition: Coordinate;
   displayOffset: Coordinate;
   highlightSprite: Sprite;
+  containingTile: LevelTile;
 
   active: boolean = false;
 
@@ -28,9 +29,11 @@ export default class Character extends GameEntity {
   }
 
   moveToTile(tile: LevelTile) {
-    tile.addEntityToTile(this);
+    this.containingTile = tile;
     this.position = addCoords(tile.position, this.displayOffset);
     this.highlightPosition = addCoords(this.position, {x: 1, y: 1});
+
+    tile.addEntityToTile(this);
   }
 
   render(frame: CellGrid<Color>): void {

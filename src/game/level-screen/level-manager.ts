@@ -122,13 +122,19 @@ export default class LevelManager extends GameEntity {
   }
 
   showMovementTemplateForUnit(unitEntity: Character) {
-    let center = unitEntity.position;
+    let center = unitEntity.containingTile.gridPosition;
     let distance = unitEntity.model.movement;
+
     /* do stuff */
     console.log('showing movement template');
+    let centerTile = this.levelGrid.cellAt(center);
+    centerTile.showHighlightBorders = true;
   }
 
   clearMovementTemplates() {
     console.log('clearing movement template');
+    this.levelGrid.iterateCells((tile: LevelTile) => {
+      tile.showHighlightBorders = false;
+    });
   }
 }
