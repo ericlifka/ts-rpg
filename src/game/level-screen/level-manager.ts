@@ -1,6 +1,6 @@
 import GameEntity from "../../pxlr/core/game-entity";
 import Camera from "./camera";
-import {Coordinate, coordNeighbors, Dimension} from "../../pxlr/utils/types";
+import {Coordinate, coordNeighbors, Dimension, ORDINALS} from "../../pxlr/utils/types";
 import LevelTile from "./level-tile";
 import Cursor from "./cursor";
 import {emptyFieldLevel} from "../level-definitions/empty-field";
@@ -8,6 +8,7 @@ import {LevelDefinition} from "../level-definitions/level-type";
 import CellGrid from "../../pxlr/core/cell-grid";
 import Character from "./entities/unit";
 import {SWORD_GIRL_CHARACTER_SPRITE} from '../sprites/chatacters/sword-girl';
+import {zip} from "../../pxlr/utils/zip";
 
 const KEYBOARD = 0;
 
@@ -125,10 +126,12 @@ export default class LevelManager extends GameEntity {
     let center = unitEntity.containingTile.gridPosition;
     let distance = unitEntity.model.movement;
 
-    let queue = [ {
+    let highlightedTiles = [];
+
+    let queue = [{
       coord: center,
       remainingMove: distance
-    } ];
+    }];
 
     const visitTile = () => {
       let next = queue.shift();
@@ -136,14 +139,14 @@ export default class LevelManager extends GameEntity {
 
       if (tile && !tile.showHighlightBorders && !tile.border_tile) {
         tile.showHighlightBorders = true;
+        tile.resetHighlightBorders();
+        highlightedTiles.push(tile);
+
         if (next.remainingMove > 0) {
           let neighbors = coordNeighbors(next.coord);
-          neighbors.forEach((coord: Coordinate) => {
-            queue.push({
-              coord,
-              remainingMove: next.remainingMove - 1
-            });
-          });
+          neighbors.forEach((coord: Coordinate) => queue.push({
+            coord, remainingMove: next.remainingMove - 1
+          }));
         }
       }
 
@@ -153,6 +156,18 @@ export default class LevelManager extends GameEntity {
     };
 
     visitTile();
+
+    highlightedTiles.forEach((tile: LevelTile) => {
+      let neighbors = zip(ORDINALS, coordNeighbors(tile.gridPosition)
+        .map((coord: Coordinate) =>
+          this.levelGrid.cellAt(coord)));
+
+      ORDINALS.forEach(direction => {
+        if (neighbors[direction].showHighlightBorders) {
+          tile.visibleHighlightBorders[direction] = false;
+        }
+      });
+    });
   }
 
   clearMovementTemplates() {

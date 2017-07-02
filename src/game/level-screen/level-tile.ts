@@ -46,10 +46,18 @@ export default class LevelTile extends GameEntity {
     this.camera.renderAdjustedEntity(frame, this.sprite, this.position, BACKGROUND);
 
     if (this.showHighlightBorders) {
-      this.camera.renderAdjustedEntity(frame, BORDER_TOP, this.position, DECORATION);
-      this.camera.renderAdjustedEntity(frame, BORDER_RIGHT, this.position, DECORATION);
-      this.camera.renderAdjustedEntity(frame, BORDER_BOTTOM, this.position, DECORATION);
-      this.camera.renderAdjustedEntity(frame, BORDER_LEFT, this.position, DECORATION);
+      if (this.visibleHighlightBorders.top) {
+        this.camera.renderAdjustedEntity(frame, BORDER_TOP, this.position, DECORATION);
+      }
+      if (this.visibleHighlightBorders.right) {
+        this.camera.renderAdjustedEntity(frame, BORDER_RIGHT, this.position, DECORATION);
+      }
+      if (this.visibleHighlightBorders.bottom) {
+        this.camera.renderAdjustedEntity(frame, BORDER_BOTTOM, this.position, DECORATION);
+      }
+      if (this.visibleHighlightBorders.left) {
+        this.camera.renderAdjustedEntity(frame, BORDER_LEFT, this.position, DECORATION);
+      }
     }
   }
 
