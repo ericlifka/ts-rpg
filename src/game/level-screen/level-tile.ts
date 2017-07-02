@@ -1,10 +1,11 @@
 import GameEntity from "../../pxlr/core/game-entity";
 import Camera from "./camera";
-import {Color, Coordinate} from "../../pxlr/utils/types";
+import {Color, Coordinate, ORDINALS} from "../../pxlr/utils/types";
 import Sprite from "../../pxlr/core/sprite";
 import CellGrid from "../../pxlr/core/cell-grid";
 import {BACKGROUND, DECORATION} from "../../pxlr/utils/layers";
-import {BORDER_BOTTOM, BORDER_LEFT, BORDER_RIGHT, BORDER_TOP} from "../sprites/interface/highlight-borders";
+import {BORDER_SPRITES} from "../sprites/interface/highlight-borders";
+import {zip} from "../../pxlr/utils/zip";
 
 type BorderMarker = {
   top: boolean,
@@ -46,18 +47,11 @@ export default class LevelTile extends GameEntity {
     this.camera.renderAdjustedEntity(frame, this.sprite, this.position, BACKGROUND);
 
     if (this.showHighlightBorders) {
-      if (this.visibleHighlightBorders.top) {
-        this.camera.renderAdjustedEntity(frame, BORDER_TOP, this.position, DECORATION);
-      }
-      if (this.visibleHighlightBorders.right) {
-        this.camera.renderAdjustedEntity(frame, BORDER_RIGHT, this.position, DECORATION);
-      }
-      if (this.visibleHighlightBorders.bottom) {
-        this.camera.renderAdjustedEntity(frame, BORDER_BOTTOM, this.position, DECORATION);
-      }
-      if (this.visibleHighlightBorders.left) {
-        this.camera.renderAdjustedEntity(frame, BORDER_LEFT, this.position, DECORATION);
-      }
+      ORDINALS.forEach(direction => {
+        if (this.visibleHighlightBorders[direction]) {
+          this.camera.renderAdjustedEntity(frame, BORDER_SPRITES[direction], this.position, DECORATION);
+        }
+      });
     }
   }
 
@@ -70,11 +64,6 @@ export default class LevelTile extends GameEntity {
   }
 
   resetHighlightBorders() {
-    this.visibleHighlightBorders = {
-      top: true,
-      right: true,
-      bottom: true,
-      left: true
-    };
+    this.visibleHighlightBorders = zip(ORDINALS, [], true) as BorderMarker;
   }
 }

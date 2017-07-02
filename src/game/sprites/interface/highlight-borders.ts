@@ -1,4 +1,6 @@
 import Sprite from "../../../pxlr/core/sprite";
+import {ORDINALS} from "../../../pxlr/utils/types";
+import {zip} from "../../../pxlr/utils/zip";
 
 const IMPORTED_SPRITE_DATA = {
   "schema": 2,
@@ -13,3 +15,10 @@ export const BORDER_TOP = Sprite.newFromColorSheet(IMPORTED_SPRITE_DATA.frames[0
 export const BORDER_RIGHT = Sprite.newFromColorSheet(IMPORTED_SPRITE_DATA.frames[1]);
 export const BORDER_BOTTOM = Sprite.newFromColorSheet(IMPORTED_SPRITE_DATA.frames[2]);
 export const BORDER_LEFT = Sprite.newFromColorSheet(IMPORTED_SPRITE_DATA.frames[3]);
+
+export const BORDER_SPRITES = zip(ORDINALS, [
+  BORDER_TOP,
+  BORDER_RIGHT,
+  BORDER_BOTTOM,
+  BORDER_LEFT
+]);
