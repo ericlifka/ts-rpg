@@ -2,8 +2,9 @@
 import {Camera, Color, Coordinate, Dimension} from "../utils/types";
 import CellGrid from "./cell-grid";
 import Sprite from "./sprite";
+import GameEntity from "./game-entity";
 
-export default class PassThroughCamera implements Camera {
+export default class PassThroughCamera extends GameEntity implements Camera {
   mapToScreenCoord(coordinate: Coordinate): Coordinate {
     return coordinate;
   }
