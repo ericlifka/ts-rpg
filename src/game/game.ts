@@ -1,5 +1,4 @@
 import GameEntity from "../pxlr/core/game-entity";
-import LevelManager from "./level-screen/level-manager";
 import {Dimension} from "../pxlr/utils/types";
 import LevelView from "./views/level";
 
