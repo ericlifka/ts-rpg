@@ -1,3 +1,6 @@
+import CellGrid from "../core/cell-grid";
+import Sprite from "../core/sprite";
+
 export type Coordinate = {
   x: number,
   y: number
@@ -44,4 +47,10 @@ export const ORDINALS = [ 'top', 'right', 'bottom', 'left' ];
 
 export function copyDimension(target: Dimension): Dimension {
   return {width: target.width, height: target.height};
+}
+
+export interface Camera {
+  mapToScreenCoord(coordinate: Coordinate): Coordinate;
+  isVisible(point: Coordinate, size: Dimension);
+  renderEntity(frame: CellGrid<Color>, sprite: Sprite, position: Coordinate, layer: number);
 }

@@ -1,16 +1,16 @@
 import GameEntity from "../pxlr/core/game-entity";
 import LevelManager from "./level-screen/level-manager";
 import {Dimension} from "../pxlr/utils/types";
+import LevelView from "./views/level";
 
 export default class Game extends GameEntity {
 
-  levelManager: LevelManager;
+  levelView: LevelView;
 
   constructor(public dimensions: Dimension) {
     super(null);
 
-    this.levelManager = new LevelManager(this, this.dimensions);
-
-    this.addChild(this.levelManager);
+    this.levelView = new LevelView(this, this.dimensions);
+    this.addChild(this.levelView);
   }
 }
