@@ -10,7 +10,7 @@ export default class GameEntity {
     this.children = [];
   }
 
-  bindToModel(modelRef) {
+  bindToModel(modelRef): any {
     this.model = modelRef;
     modelRef.component = this;
 
@@ -29,20 +29,24 @@ export default class GameEntity {
     });
   }
 
-  addChild(child: GameEntity): void {
+  addChild(child: GameEntity): any {
     if (child) {
       this.children.push(child);
     }
+
+    return child;
   }
 
-  removeChild(child: GameEntity): void {
+  removeChild(child: GameEntity): any {
     let index = this.children.indexOf(child);
     if (index >= 0) {
       this.children.splice(index, 1);
     }
+
+    return child;
   }
 
-  triggerEvent(event: string, ...args) {
+  triggerEvent(event: string, ...args): any {
     let scope: GameEntity = this;
     while (!scope[event] || typeof scope[event] !== "function") {
       scope = scope.parent;

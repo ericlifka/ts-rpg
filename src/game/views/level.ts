@@ -4,10 +4,11 @@ import {forestMeadowLevel} from "../level-definitions/forest-meadow";
 import Character from "../components/character";
 import {SWORD_GIRL_CHARACTER_SPRITE} from "../sprites/chatacters/sword-girl";
 import CursorCamera from "../components/cursor-camera";
+import {Game} from "../models/game";
 
 export default class LevelView extends GameEntity {
 
-  public model;
+  public model: Game;
 
   constructor(parent, public dimensions: Dimension) {
     super(parent);
@@ -15,20 +16,25 @@ export default class LevelView extends GameEntity {
     let levelSpec = forestMeadowLevel;
 
     this.model = {
-      cursor: { position: copyCoord(levelSpec.cursorStart) },
-      camera: {},
-      tiles: [],
-      characters: [
-        { position: copyCoord(levelSpec.cursorStart), sprite: SWORD_GIRL_CHARACTER_SPRITE }
-      ],
-      units: []
+      camera: {
+        position: copyCoord(levelSpec.cursorStart)
+      },
+      player: {
+        position: copyCoord(levelSpec.cursorStart),
+        sprite: SWORD_GIRL_CHARACTER_SPRITE
+      },
     };
 
-    let camera = new CursorCamera(this).bindToModel(this.model.camera);
-    this.addChild(camera);
-    this.camera = camera;
+    this.camera = this.addChild(
+      new CursorCamera(this)
+        .bindToModel(this.model.camera));
 
-    let character = new Character(this).bindToModel(this.model.characters[0]);
-    this.addChild(character);
+    this.addChild(
+      new Character(this)
+        .bindToModel(this.model.player));
+  }
+
+  movePlayer() {
+    this.model.player.position.x += 1;
   }
 }
