@@ -1,10 +1,11 @@
 import GameEntity from "../../pxlr/core/game-entity";
-import {Coordinate, copyCoord, Dimension, Ordinal, ORDINALS} from "../../pxlr/utils/types";
+import {Coordinate, Dimension, Ordinal, ORDINALS} from "../../pxlr/utils/types";
 import {forestMeadowLevel} from "../level-definitions/forest-meadow";
 import Character from "../components/character";
-import {SWORD_GIRL_CHARACTER_SPRITE, SWORD_GIRL_SPRITES} from "../sprites/chatacters/sword-girl";
+import {SWORD_GIRL_SPRITES} from "../sprites/chatacters/sword-girl";
 import CursorCamera from "../components/cursor-camera";
 import {Game} from "../models/game";
+import {copyCoord} from "../../pxlr/utils/vectors";
 
 export default class LevelView extends GameEntity {
 

@@ -1,7 +1,8 @@
 import GameEntity from "../../pxlr/core/game-entity";
 import CellGrid from "../../pxlr/core/cell-grid";
-import {addCoords, Camera, Color, Coordinate, InputMap, ORDINALS} from "../../pxlr/utils/types";
+import {Camera, Color, Coordinate, InputMap, ORDINALS} from "../../pxlr/utils/types";
 import {CHARACTER} from "../../pxlr/utils/layers";
+import {addCoords} from "../../pxlr/utils/vectors";
 
 export default class Character extends GameEntity {
 
@@ -10,23 +11,30 @@ export default class Character extends GameEntity {
   }
 
   update(dtime: number, inputSources: InputMap): void {
-    const input = inputSources.keyboard;
+    this.processKeyboardInput(inputSources.keyboard);
+    this.processGamepadInput(inputSources.gamepad);
+  }
 
+  processGamepadInput(input) {
+
+  }
+
+  processKeyboardInput(input) {
     if (input.A) {
       if (this.model.direction !== ORDINALS.WEST) {
-        this.triggerEvent('turnPlayer', ORDINALS.WEST)
+        this.triggerEvent('turnPlayer', ORDINALS.WEST);
       }
     } else if (input.D) {
       if (this.model.direction !== ORDINALS.EAST) {
-        this.triggerEvent('turnPlayer', ORDINALS.EAST)
+        this.triggerEvent('turnPlayer', ORDINALS.EAST);
       }
     } else if (input.W) {
       if (this.model.direction !== ORDINALS.NORTH) {
-        this.triggerEvent('turnPlayer', ORDINALS.NORTH)
+        this.triggerEvent('turnPlayer', ORDINALS.NORTH);
       }
     } else if (input.S) {
       if (this.model.direction !== ORDINALS.SOUTH) {
-        this.triggerEvent('turnPlayer', ORDINALS.SOUTH)
+        this.triggerEvent('turnPlayer', ORDINALS.SOUTH);
       }
     }
 
