@@ -1,5 +1,5 @@
 import CellGrid from "./cell-grid";
-import {Camera, Color} from "../utils/types";
+import {Camera, Color, InputMap} from "../utils/types";
 
 export default class GameEntity {
   children: GameEntity[];
@@ -17,7 +17,7 @@ export default class GameEntity {
     return this;
   }
 
-  update(dtime: number, inputSources: any[]): void {
+  update(dtime: number, inputSources: InputMap): void {
     this.children.forEach(child => {
       child.update(dtime, inputSources);
     });

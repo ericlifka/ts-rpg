@@ -1,6 +1,11 @@
 import CellGrid from "../core/cell-grid";
 import Sprite from "../core/sprite";
 
+export type InputMap = {
+  keyboard: any,
+  gamepad: any
+};
+
 export type Coordinate = {
   x: number,
   y: number
