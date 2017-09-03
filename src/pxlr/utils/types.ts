@@ -43,7 +43,13 @@ export function coordNeighbors(target: Coordinate): Coordinate[] {
     addCoords(target, { x: -1, y: 0 })
   ];
 }
-export const ORDINALS = [ 'top', 'right', 'bottom', 'left' ];
+export const ORDINALS = {
+  NORTH: 0 as Ordinal,
+  EAST: 1 as Ordinal,
+  SOUTH: 2 as Ordinal,
+  WEST: 3 as Ordinal,
+};
+export type Ordinal = 0 | 1 | 2 | 3;
 
 export function copyDimension(target: Dimension): Dimension {
   return {width: target.width, height: target.height};

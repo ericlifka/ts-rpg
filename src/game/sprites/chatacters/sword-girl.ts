@@ -11,4 +11,11 @@ const IMPORTED_SPRITE_DATA = {
 
 const pixels: string[][] = IMPORTED_SPRITE_DATA.frames[0];
 
+export const SWORD_GIRL_SPRITES = [
+  Sprite.newFromColorSheet(IMPORTED_SPRITE_DATA.frames[1]),
+  Sprite.newFromColorSheet(IMPORTED_SPRITE_DATA.frames[3]),
+  Sprite.newFromColorSheet(IMPORTED_SPRITE_DATA.frames[0]),
+  Sprite.newFromColorSheet(IMPORTED_SPRITE_DATA.frames[2])
+];
+
 export const SWORD_GIRL_CHARACTER_SPRITE = Sprite.newFromColorSheet(pixels);

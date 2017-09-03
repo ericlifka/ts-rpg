@@ -2,7 +2,7 @@ import GameEntity from "../../pxlr/core/game-entity";
 import {copyCoord, Dimension} from "../../pxlr/utils/types";
 import {forestMeadowLevel} from "../level-definitions/forest-meadow";
 import Character from "../components/character";
-import {SWORD_GIRL_CHARACTER_SPRITE} from "../sprites/chatacters/sword-girl";
+import {SWORD_GIRL_CHARACTER_SPRITE, SWORD_GIRL_SPRITES} from "../sprites/chatacters/sword-girl";
 import CursorCamera from "../components/cursor-camera";
 import {Game} from "../models/game";
 
@@ -21,7 +21,8 @@ export default class LevelView extends GameEntity {
       },
       player: {
         position: copyCoord(levelSpec.cursorStart),
-        sprite: SWORD_GIRL_CHARACTER_SPRITE
+        sprites: SWORD_GIRL_SPRITES,
+        direction: 0
       },
     };
 
