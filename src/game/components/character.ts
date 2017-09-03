@@ -19,14 +19,14 @@ export default class Character extends GameEntity {
 
     camera.renderEntity(
       frame,
-      WALKING_WEST_FRAMES[this.frameCounter],
+      WALKING_EAST_FRAMES[this.frameCounter],
       this.model.position,
       CHARACTER);
 
     if (this.frameDelay > 150) {
       this.frameDelay = 0;
       this.frameCounter++;
-      if (this.frameCounter >= WALKING_WEST_FRAMES.length) {
+      if (this.frameCounter >= WALKING_EAST_FRAMES.length) {
         this.frameCounter = 0;
       }
     }
