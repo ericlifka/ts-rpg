@@ -3,14 +3,39 @@ import CellGrid from "../../pxlr/core/cell-grid";
 import {Camera, Color, Coordinate, InputMap, ORDINALS} from "../../pxlr/utils/types";
 import {CHARACTER} from "../../pxlr/utils/layers";
 import {addCoords} from "../../pxlr/utils/vectors";
+import {
+  WALKING_EAST_FRAMES, WALKING_NORTH_FRAMES, WALKING_SOUTH_FRAMES,
+  WALKING_WEST_FRAMES
+} from "../sprites/chatacters/sword-girl";
 
 export default class Character extends GameEntity {
 
+  frameCounter = 0;
+  frameDelay = 0;
+
   render(frame: CellGrid<Color>, camera: Camera) {
-    camera.renderEntity(frame, this.model.sprites[this.model.direction], this.model.position, CHARACTER);
+    // camera.renderEntity(frame, this.model.sprites[this.model.direction], this.model.position, CHARACTER);
+
+
+    camera.renderEntity(
+      frame,
+      WALKING_WEST_FRAMES[this.frameCounter],
+      this.model.position,
+      CHARACTER);
+
+    if (this.frameDelay > 150) {
+      this.frameDelay = 0;
+      this.frameCounter++;
+      if (this.frameCounter >= WALKING_WEST_FRAMES.length) {
+        this.frameCounter = 0;
+      }
+    }
+
   }
 
   update(dtime: number, inputSources: InputMap): void {
+    this.frameDelay += dtime;
+
     this.processKeyboardInput(inputSources.keyboard);
     this.processGamepadInput(inputSources.gamepad);
   }
