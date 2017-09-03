@@ -1,5 +1,5 @@
 import GameEntity from "../../pxlr/core/game-entity";
-import {copyCoord, Dimension, Ordinal, ORDINALS} from "../../pxlr/utils/types";
+import {Coordinate, copyCoord, Dimension, Ordinal, ORDINALS} from "../../pxlr/utils/types";
 import {forestMeadowLevel} from "../level-definitions/forest-meadow";
 import Character from "../components/character";
 import {SWORD_GIRL_CHARACTER_SPRITE, SWORD_GIRL_SPRITES} from "../sprites/chatacters/sword-girl";
@@ -35,8 +35,9 @@ export default class LevelView extends GameEntity {
         .bindToModel(this.model.player));
   }
 
-  movePlayer() {
-    this.model.player.position.x += 1;
+  movePlayer(newPosition: Coordinate) {
+    this.model.player.position.x = newPosition.x;
+    this.model.player.position.y = newPosition.y;
   }
 
   turnPlayer(direction: Ordinal) {

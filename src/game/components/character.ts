@@ -1,6 +1,6 @@
 import GameEntity from "../../pxlr/core/game-entity";
 import CellGrid from "../../pxlr/core/cell-grid";
-import {Camera, Color, InputMap, ORDINALS} from "../../pxlr/utils/types";
+import {addCoords, Camera, Color, Coordinate, InputMap, ORDINALS} from "../../pxlr/utils/types";
 import {CHARACTER} from "../../pxlr/utils/layers";
 
 export default class Character extends GameEntity {
@@ -28,6 +28,24 @@ export default class Character extends GameEntity {
       if (this.model.direction !== ORDINALS.SOUTH) {
         this.triggerEvent('turnPlayer', ORDINALS.SOUTH)
       }
+    }
+
+    let direction: Coordinate = {x: 0, y: 0};
+    if (input.A) {
+      direction = addCoords(direction, {x: -1, y: 0});
+    }
+    if (input.D) {
+      direction = addCoords(direction, {x: 1, y: 0});
+    }
+    if (input.W) {
+      direction = addCoords(direction, {x: 0, y: 1});
+    }
+    if (input.S) {
+      direction = addCoords(direction, {x: 0, y: -1});
+    }
+
+    if (direction.x !== 0 || direction.y !== 0) {
+      this.triggerEvent('movePlayer', addCoords(this.model.position, direction));
     }
   }
 
