@@ -56,7 +56,7 @@ export default class Character extends GameEntity {
     let facingDirectionChanged = false;
     let movementStateChange = false;
 
-    let facingDirection;
+    let facingDirection = this.model.facing;
 
     if (input.A) {
       facingDirection = ORDINALS.WEST;
