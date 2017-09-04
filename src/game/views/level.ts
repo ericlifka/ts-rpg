@@ -2,10 +2,10 @@ import GameEntity from "../../pxlr/core/game-entity";
 import {Coordinate, Dimension, Ordinal, ORDINALS} from "../../pxlr/utils/types";
 import {forestMeadowLevel} from "../level-definitions/forest-meadow";
 import Character from "../components/character";
-import {SWORD_GIRL_SPRITES} from "../sprites/chatacters/sword-girl";
 import CursorCamera from "../components/cursor-camera";
 import {Game} from "../models/game";
 import {copyCoord} from "../../pxlr/utils/vectors";
+import {SWORD_GIRL_ANIMATIONS} from "../sprites/chatacters/sword-girl";
 
 export default class LevelView extends GameEntity {
 
@@ -22,8 +22,8 @@ export default class LevelView extends GameEntity {
       },
       player: {
         position: copyCoord(levelSpec.cursorStart),
-        sprites: SWORD_GIRL_SPRITES,
-        direction: ORDINALS.NORTH
+        sprites: SWORD_GIRL_ANIMATIONS(),
+        facing: ORDINALS.NORTH
       },
     };
 
@@ -41,7 +41,7 @@ export default class LevelView extends GameEntity {
     this.model.player.position.y = newPosition.y;
   }
 
-  turnPlayer(direction: Ordinal) {
-    this.model.player.direction = direction;
+  turnPlayer(facing: Ordinal) {
+    this.model.player.facing = facing;
   }
 }

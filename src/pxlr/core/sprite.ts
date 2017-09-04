@@ -18,13 +18,6 @@ export default class Sprite extends CellGrid<RGBColor> {
     return this;
   }
 
-  update(dtime) {
-    /*
-     sprites ignore updates by default, but accept the event
-     so that the api signature of sprites and animations matches
-     */
-  }
-
   render(frame: CellGrid<Color>, targetCoord: Coordinate, index = 0) {
     let {x, y} = floorCoord(targetCoord);
     let {x: offset_x, y: offset_y} = this.offsetAdjustment;

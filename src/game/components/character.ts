@@ -3,38 +3,46 @@ import CellGrid from "../../pxlr/core/cell-grid";
 import {Camera, Color, Coordinate, InputMap, ORDINALS} from "../../pxlr/utils/types";
 import {CHARACTER} from "../../pxlr/utils/layers";
 import {addCoords} from "../../pxlr/utils/vectors";
-import {
-  WALKING_EAST_FRAMES, WALKING_NORTH_FRAMES, WALKING_SOUTH_FRAMES,
-  WALKING_WEST_FRAMES
-} from "../sprites/chatacters/sword-girl";
+import {SWORD_GIRL_SPRITE_KEYS} from "../sprites/chatacters/sword-girl";
 
 export default class Character extends GameEntity {
 
   frameCounter = 0;
   frameDelay = 0;
 
+  moving: boolean = false;
+
   render(frame: CellGrid<Color>, camera: Camera) {
-    // camera.renderEntity(frame, this.model.sprites[this.model.direction], this.model.position, CHARACTER);
+    camera.renderEntity(frame, this.model.sprites, this.model.position, CHARACTER);
 
 
-    camera.renderEntity(
-      frame,
-      WALKING_EAST_FRAMES[this.frameCounter],
-      this.model.position,
-      CHARACTER);
+    // camera.renderEntity(
+    //   frame,
+    //   WALKING_EAST_FRAMES[this.frameCounter],
+    //   this.model.position,
+    //   CHARACTER);
+    //
+    // if (this.frameDelay > 100) {
+    //   this.frameDelay = 0;
+    //   this.frameCounter++;
+    //   if (this.frameCounter >= WALKING_EAST_FRAMES.length) {
+    //     this.frameCounter = 0;
+    //   }
+    // }
 
-    if (this.frameDelay > 150) {
-      this.frameDelay = 0;
-      this.frameCounter++;
-      if (this.frameCounter >= WALKING_EAST_FRAMES.length) {
-        this.frameCounter = 0;
-      }
-    }
+  }
 
+  bindToModel(model) {
+    let res = super.bindToModel(model);
+
+    this.model.sprites.loadSprite('standing-north');
+
+    return res;
   }
 
   update(dtime: number, inputSources: InputMap): void {
     this.frameDelay += dtime;
+    this.model.sprites.update(dtime);
 
     this.processKeyboardInput(inputSources.keyboard);
     this.processGamepadInput(inputSources.gamepad);
@@ -45,22 +53,27 @@ export default class Character extends GameEntity {
   }
 
   processKeyboardInput(input) {
+    let facingDirectionChanged = false;
+    let movementStateChange = false;
+
+    let facingDirection;
+
     if (input.A) {
-      if (this.model.direction !== ORDINALS.WEST) {
-        this.triggerEvent('turnPlayer', ORDINALS.WEST);
-      }
-    } else if (input.D) {
-      if (this.model.direction !== ORDINALS.EAST) {
-        this.triggerEvent('turnPlayer', ORDINALS.EAST);
-      }
-    } else if (input.W) {
-      if (this.model.direction !== ORDINALS.NORTH) {
-        this.triggerEvent('turnPlayer', ORDINALS.NORTH);
-      }
-    } else if (input.S) {
-      if (this.model.direction !== ORDINALS.SOUTH) {
-        this.triggerEvent('turnPlayer', ORDINALS.SOUTH);
-      }
+      facingDirection = ORDINALS.WEST;
+    }
+    else if (input.D) {
+      facingDirection = ORDINALS.EAST;
+    }
+    else if (input.W) {
+      facingDirection = ORDINALS.NORTH;
+    }
+    else if (input.S) {
+      facingDirection = ORDINALS.SOUTH;
+    }
+
+    if (facingDirection !== this.model.facing) {
+      facingDirectionChanged = true;
+      this.triggerEvent('turnPlayer', facingDirection);
     }
 
     let direction: Coordinate = {x: 0, y: 0};
@@ -78,8 +91,29 @@ export default class Character extends GameEntity {
     }
 
     if (direction.x !== 0 || direction.y !== 0) {
+      if (!this.moving) {
+        movementStateChange = true;
+        this.moving = true;
+      }
+
       this.triggerEvent('movePlayer', addCoords(this.model.position, direction));
     }
+    else if (this.moving) {
+      movementStateChange = true;
+      this.moving = false;
+    }
+
+    if (movementStateChange || facingDirectionChanged) {
+      this.updateSpriteGroup();
+    }
+  }
+
+  updateSpriteGroup() {
+    let key = this.moving ?
+      SWORD_GIRL_SPRITE_KEYS.WALKING[this.model.facing] :
+      SWORD_GIRL_SPRITE_KEYS.STANDING[this.model.facing];
+
+    this.model.sprites.loadSprite(key);
   }
 
 }
