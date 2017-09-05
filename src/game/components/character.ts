@@ -35,7 +35,9 @@ export default class Character extends GameEntity {
   bindToModel(model) {
     let res = super.bindToModel(model);
 
-    this.model.sprites.loadSprite('standing-north');
+    this.model.sprites
+      .loadSprite('standing-north')
+      .setFrameDelay(100);
 
     return res;
   }

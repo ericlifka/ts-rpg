@@ -3,14 +3,14 @@ import {Camera, Color, InputMap} from "../utils/types";
 
 export default class GameEntity {
   children: GameEntity[];
-  model;
+  model: any;
   camera?: Camera;
 
   constructor(public parent: GameEntity) {
     this.children = [];
   }
 
-  bindToModel(modelRef): any {
+  bindToModel(modelRef: any): any {
     this.model = modelRef;
     modelRef.component = this;
 
