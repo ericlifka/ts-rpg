@@ -31,3 +31,14 @@ export function coordNeighbors(target: Coordinate): Coordinate[] {
 export function copyDimension(target: Dimension): Dimension {
   return {width: target.width, height: target.height};
 }
+
+export function normalize(vector: Coordinate, targetLength: number = 1) {
+  let {x, y} = vector;
+  let length = Math.sqrt(x*x + y*y);
+  let proportion = targetLength / length;
+
+  return {
+    x: x * proportion,
+    y: y * proportion
+  };
+}

@@ -2,34 +2,20 @@ import GameEntity from "../../pxlr/core/game-entity";
 import CellGrid from "../../pxlr/core/cell-grid";
 import {Camera, Color, Coordinate, InputMap, ORDINALS} from "../../pxlr/utils/types";
 import {CHARACTER} from "../../pxlr/utils/layers";
-import {addCoords} from "../../pxlr/utils/vectors";
+import {addCoords, normalize} from "../../pxlr/utils/vectors";
 import {SWORD_GIRL_SPRITE_KEYS} from "../sprites/chatacters/sword-girl";
 
 export default class Character extends GameEntity {
 
-  frameCounter = 0;
-  frameDelay = 0;
-
   moving: boolean = false;
+  movementRate: number = 75;
 
   render(frame: CellGrid<Color>, camera: Camera) {
-    camera.renderEntity(frame, this.model.sprites, this.model.position, CHARACTER);
-
-
-    // camera.renderEntity(
-    //   frame,
-    //   WALKING_EAST_FRAMES[this.frameCounter],
-    //   this.model.position,
-    //   CHARACTER);
-    //
-    // if (this.frameDelay > 100) {
-    //   this.frameDelay = 0;
-    //   this.frameCounter++;
-    //   if (this.frameCounter >= WALKING_EAST_FRAMES.length) {
-    //     this.frameCounter = 0;
-    //   }
-    // }
-
+    camera.renderEntity(
+      frame,
+      this.model.sprites,
+      this.model.position,
+      CHARACTER);
   }
 
   bindToModel(model) {
@@ -43,18 +29,17 @@ export default class Character extends GameEntity {
   }
 
   update(dtime: number, inputSources: InputMap): void {
-    this.frameDelay += dtime;
     this.model.sprites.update(dtime);
 
-    this.processKeyboardInput(inputSources.keyboard);
-    this.processGamepadInput(inputSources.gamepad);
+    this.processKeyboardInput(inputSources.keyboard, dtime);
+    this.processGamepadInput(inputSources.gamepad, dtime);
   }
 
-  processGamepadInput(input) {
+  processGamepadInput(input, dtime) {
 
   }
 
-  processKeyboardInput(input) {
+  processKeyboardInput(input, dtime) {
     let facingDirectionChanged = false;
     let movementStateChange = false;
 
@@ -98,6 +83,7 @@ export default class Character extends GameEntity {
         this.moving = true;
       }
 
+      direction = normalize(direction, dtime * this.movementRate / 1000);
       this.triggerEvent('movePlayer', addCoords(this.model.position, direction));
     }
     else if (this.moving) {
