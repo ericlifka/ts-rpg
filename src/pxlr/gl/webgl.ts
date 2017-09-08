@@ -87,7 +87,9 @@ export default class WebGL {
   }
 
   createGl() {
-    let gl = this.canvas.getContext("webgl");
+    let gl = this.canvas.getContext("webgl") ||
+      this.canvas.getContext("experimental-webgl");
+
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clearDepth(1.0);
     gl.enable(gl.DEPTH_TEST);
