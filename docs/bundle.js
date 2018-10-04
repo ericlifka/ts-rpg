@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 25);
+/******/ 	return __webpack_require__(__webpack_require__.s = 26);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -83,10 +83,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var cell_grid_1 = __webpack_require__(2);
-var rgb_color_1 = __webpack_require__(26);
-var types_1 = __webpack_require__(5);
-var Sprite = (function (_super) {
+var cell_grid_1 = __webpack_require__(3);
+var rgb_color_1 = __webpack_require__(27);
+var types_1 = __webpack_require__(2);
+var Sprite = /** @class */ (function (_super) {
     __extends(Sprite, _super);
     function Sprite(defaultColor, offsetAdjustment) {
         if (defaultColor === void 0) { defaultColor = rgb_color_1["default"]; }
@@ -100,12 +100,6 @@ var Sprite = (function (_super) {
     Sprite.prototype.setPermanentOffset = function (_a) {
         var _b = _a === void 0 ? {} : _a, _c = _b.x, x = _c === void 0 ? 0 : _c, _d = _b.y, y = _d === void 0 ? 0 : _d;
         this.offsetAdjustment = { x: x, y: y };
-        return this;
-    };
-    Sprite.prototype.applyColor = function (colorCode) {
-        this.iterateCells(function (color, coord) {
-            return color.setFromHex(colorCode);
-        });
         return this;
     };
     Sprite.prototype.update = function (dtime) {
@@ -125,7 +119,7 @@ var Sprite = (function (_super) {
                     x: x + _x + offset_x,
                     y: y + _y + offset_y
                 });
-                if (index >= frameColor.index) {
+                if (frameColor && index >= frameColor.index) {
                     frameColor.copyFromColor(color);
                     frameColor.index = index;
                 }
@@ -146,55 +140,14 @@ var Sprite = (function (_super) {
         sprite.dimensions = types_1.copyDimension(this.dimensions);
         return sprite;
     };
-    Sprite.prototype.rotateLeft = function () {
-        var width = this.dimensions.width;
-        var height = this.dimensions.height;
-        var oldCells = this.cells;
-        var newCells = [];
-        var x, y;
-        for (x = 0; x < height; x++) {
-            newCells[x] = [];
-        }
-        for (x = 0; x < width; x++) {
-            for (y = 0; y < height; y++) {
-                newCells[y][width - x - 1] = oldCells[x][y];
-            }
-        }
-        this.dimensions = {
-            width: height,
-            height: width
-        };
-        this.cells = newCells;
-        return this;
-    };
-    Sprite.prototype.rotateRight = function () {
-        return this
-            .rotateLeft()
-            .rotateLeft()
-            .rotateLeft();
-    };
-    Sprite.prototype.invertX = function () {
-        for (var x = 0; x < this.dimensions.width / 2; x++) {
-            var left = this.cells[x];
-            var right = this.cells[this.dimensions.width - x - 1];
-            this.cells[x] = right;
-            this.cells[this.dimensions.width - x - 1] = left;
-        }
-        return this;
-    };
-    Sprite.prototype.invertY = function () {
-        for (var x = 0; x < this.dimensions.width; x++) {
-            this.cells[x].reverse();
-        }
-        return this;
-    };
     Sprite.prototype._buildEmptySheet = function (dimensions) {
         this.dimensions = dimensions;
         this.cells = [];
         for (var x = 0; x < dimensions.width; x++) {
             this.cells[x] = [];
             for (var y = 0; y < dimensions.height; y++) {
-                this.cells[x][y] = new this.defaultColor(0, 0, 0);
+                this.cells[x][y] = new this.defaultColor();
+                this.cells[x][y].setFromHex(null);
             }
         }
     };
@@ -213,6 +166,31 @@ var Sprite = (function (_super) {
         }
         return sprite;
     };
+    Sprite.createHighlight = function (template) {
+        var dimensions = {
+            width: template.dimensions.width + 2,
+            height: template.dimensions.height + 2
+        };
+        var sprite = new Sprite();
+        sprite._buildEmptySheet(dimensions);
+        template.render(sprite, { x: 1, y: 0 }, 10);
+        template.render(sprite, { x: 1, y: 2 }, 10);
+        template.render(sprite, { x: 0, y: 1 }, 10);
+        template.render(sprite, { x: 2, y: 1 }, 10);
+        template.render(sprite, { x: 0, y: 0 }, 10);
+        template.render(sprite, { x: 2, y: 2 }, 10);
+        template.render(sprite, { x: 2, y: 0 }, 10);
+        template.render(sprite, { x: 0, y: 2 }, 10);
+        sprite.applyColor(new rgb_color_1["default"](255, 255, 255));
+        return sprite;
+    };
+    Sprite.prototype.applyColor = function (color) {
+        this.iterateCells(function (cell) {
+            if (!cell.clear) {
+                cell.copyFromColor(color);
+            }
+        });
+    };
     return Sprite;
 }(cell_grid_1["default"]));
 exports["default"] = Sprite;
@@ -225,7 +203,7 @@ exports["default"] = Sprite;
 "use strict";
 
 exports.__esModule = true;
-var GameEntity = (function () {
+var GameEntity = /** @class */ (function () {
     function GameEntity(parent) {
         this.parent = parent;
         this.children = [];
@@ -251,6 +229,18 @@ var GameEntity = (function () {
             this.children.splice(index, 1);
         }
     };
+    GameEntity.prototype.sendEvent = function (event) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        if (this[event] && typeof this[event] === "function") {
+            return this[event].apply(this, args);
+        }
+        else {
+            console.error(new Error("Couldn't find " + event + " on entity " + this));
+        }
+    };
     return GameEntity;
 }());
 exports["default"] = GameEntity;
@@ -263,7 +253,42 @@ exports["default"] = GameEntity;
 "use strict";
 
 exports.__esModule = true;
-var CellGrid = (function () {
+function copyCoord(target) {
+    return { x: target.x, y: target.y };
+}
+exports.copyCoord = copyCoord;
+function addCoords(left, right) {
+    return {
+        x: left.x + right.x,
+        y: left.y + right.y
+    };
+}
+exports.addCoords = addCoords;
+function coordNeighbors(target) {
+    /* Can't put this in types so far as I know, but for convenience these are returned in the CSS order: top, right, bottom, left */
+    return [
+        addCoords(target, { x: 0, y: 1 }),
+        addCoords(target, { x: 1, y: 0 }),
+        addCoords(target, { x: 0, y: -1 }),
+        addCoords(target, { x: -1, y: 0 })
+    ];
+}
+exports.coordNeighbors = coordNeighbors;
+exports.ORDINALS = ['top', 'right', 'bottom', 'left'];
+function copyDimension(target) {
+    return { width: target.width, height: target.height };
+}
+exports.copyDimension = copyDimension;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var CellGrid = /** @class */ (function () {
     function CellGrid(dimensions, fakeCell) {
         if (fakeCell === void 0) { fakeCell = function (x, y) { return null; }; }
         this.dimensions = dimensions;
@@ -293,7 +318,7 @@ exports["default"] = CellGrid;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -307,67 +332,25 @@ exports.INTERFACE = 5;
 
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-exports.__esModule = true;
-var game_entity_1 = __webpack_require__(1);
-var layers_1 = __webpack_require__(3);
-var LevelTile = (function (_super) {
-    __extends(LevelTile, _super);
-    function LevelTile(parent, camera, sprite, gridPosition) {
-        var _this = _super.call(this, parent) || this;
-        _this.camera = camera;
-        _this.sprite = sprite;
-        _this.gridPosition = gridPosition;
-        _this.border_tile = false;
-        _this.tileSize = sprite.dimensions.width;
-        _this.center = {
-            x: _this.gridPosition.x * _this.tileSize,
-            y: _this.gridPosition.y * _this.tileSize
-        };
-        _this.position = {
-            x: _this.center.x - Math.floor(_this.sprite.dimensions.width / 2),
-            y: _this.center.y - Math.floor(_this.sprite.dimensions.height / 2)
-        };
-        return _this;
-    }
-    LevelTile.prototype.render = function (frame) {
-        var screenCoord = this.camera.mapToScreenCoord(this.position);
-        this.sprite.render(frame, screenCoord, layers_1.BACKGROUND);
-    };
-    return LevelTile;
-}(game_entity_1["default"]));
-exports["default"] = LevelTile;
-
-
-/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-function copyCoord(target) {
-    return { x: target.x, y: target.y };
+function zip(props, values, defaultVal) {
+    if (values === void 0) { values = []; }
+    if (defaultVal === void 0) { defaultVal = null; }
+    var collection = {};
+    if (!props) {
+        return collection;
+    }
+    for (var i = 0; i < props.length; i++) {
+        collection[props[i]] = values[i] || defaultVal;
+    }
+    return collection;
 }
-exports.copyCoord = copyCoord;
-function copyDimension(target) {
-    return { width: target.width, height: target.height };
-}
-exports.copyDimension = copyDimension;
+exports.zip = zip;
 
 
 /***/ }),
@@ -388,8 +371,76 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var game_entity_1 = __webpack_require__(1);
-var level_manager_1 = __webpack_require__(15);
-var Game = (function (_super) {
+var types_1 = __webpack_require__(2);
+var layers_1 = __webpack_require__(4);
+var highlight_borders_1 = __webpack_require__(21);
+var zip_1 = __webpack_require__(5);
+var LevelTile = /** @class */ (function (_super) {
+    __extends(LevelTile, _super);
+    function LevelTile(parent, camera, sprite, gridPosition) {
+        var _this = _super.call(this, parent) || this;
+        _this.camera = camera;
+        _this.sprite = sprite;
+        _this.gridPosition = gridPosition;
+        _this.border_tile = false;
+        _this.showHighlightBorders = false;
+        _this.resetHighlightBorders();
+        _this.tileSize = sprite.dimensions.width;
+        _this.center = {
+            x: _this.gridPosition.x * _this.tileSize,
+            y: _this.gridPosition.y * _this.tileSize
+        };
+        _this.position = {
+            x: _this.center.x - Math.floor(_this.sprite.dimensions.width / 2),
+            y: _this.center.y - Math.floor(_this.sprite.dimensions.height / 2)
+        };
+        return _this;
+    }
+    LevelTile.prototype.render = function (frame) {
+        var _this = this;
+        this.camera.renderAdjustedEntity(frame, this.sprite, this.position, layers_1.BACKGROUND);
+        if (this.showHighlightBorders) {
+            types_1.ORDINALS.forEach(function (direction) {
+                if (_this.visibleHighlightBorders[direction]) {
+                    _this.camera.renderAdjustedEntity(frame, highlight_borders_1.BORDER_SPRITES[direction], _this.position, layers_1.DECORATION);
+                }
+            });
+        }
+    };
+    LevelTile.prototype.addEntityToTile = function (entity) {
+        this.containedEntity = entity;
+    };
+    LevelTile.prototype.clearEntityFromTile = function () {
+        this.containedEntity = null;
+    };
+    LevelTile.prototype.resetHighlightBorders = function () {
+        this.visibleHighlightBorders = zip_1.zip(types_1.ORDINALS, [], true);
+    };
+    return LevelTile;
+}(game_entity_1["default"]));
+exports["default"] = LevelTile;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+var game_entity_1 = __webpack_require__(1);
+var level_manager_1 = __webpack_require__(16);
+var Game = /** @class */ (function (_super) {
     __extends(Game, _super);
     function Game(dimensions) {
         var _this = _super.call(this, null) || this;
@@ -404,7 +455,7 @@ exports["default"] = Game;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -444,7 +495,7 @@ function gamepadDescriptor() {
 function normalize(axisTilt) {
     return Math.round(axisTilt * 10) / 10;
 }
-var GamepadInput = (function () {
+var GamepadInput = /** @class */ (function () {
     function GamepadInput() {
         window.addEventListener("gamepadconnected", function (e) {
             console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.", e['gamepad'].index, e['gamepad'].id, e['gamepad'].buttons.length, e['gamepad'].axes.length);
@@ -479,7 +530,7 @@ exports["default"] = GamepadInput;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -502,7 +553,7 @@ var KEYS = {
     87: 'W', 65: 'A', 83: 'S', 68: 'D',
     32: 'SPACE', 13: 'ENTER'
 };
-var KeyboardInput = (function () {
+var KeyboardInput = /** @class */ (function () {
     function KeyboardInput() {
         var _this = this;
         this.clearState();
@@ -541,7 +592,7 @@ exports["default"] = KeyboardInput;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -563,7 +614,7 @@ function updateFPScounter(dtime) {
     }
     fpsCounterDOM.innerHTML = fpsStr;
 }
-var FpsTracker = (function () {
+var FpsTracker = /** @class */ (function () {
     function FpsTracker() {
         this.frameTimes = [];
         this.totalTime = 20 * 100;
@@ -581,7 +632,7 @@ var FpsTracker = (function () {
     };
     return FpsTracker;
 }());
-var RunLoop = (function () {
+var RunLoop = /** @class */ (function () {
     function RunLoop(callback) {
         if (callback === void 0) { callback = (function () { return null; }); }
         this.callback = callback;
@@ -631,14 +682,14 @@ exports["default"] = RunLoop;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var gl_frame_1 = __webpack_require__(28);
-var WebGL = (function () {
+var gl_frame_1 = __webpack_require__(29);
+var WebGL = /** @class */ (function () {
     function WebGL(options) {
         if (options === void 0) { options = {}; }
         this.width = 200;
@@ -819,14 +870,14 @@ exports["default"] = WebGL;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var grass_1 = __webpack_require__(16);
-var woods_1 = __webpack_require__(17);
+var grass_1 = __webpack_require__(17);
+var woods_1 = __webpack_require__(18);
 var g1 = grass_1["default"];
 var w1 = woods_1["default"];
 exports.emptyFieldLevel = {
@@ -849,7 +900,7 @@ exports.emptyFieldLevel = {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -866,7 +917,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var game_entity_1 = __webpack_require__(1);
-var Camera = (function (_super) {
+var Camera = /** @class */ (function (_super) {
     __extends(Camera, _super);
     function Camera(parent, dimensions) {
         var _this = _super.call(this, parent) || this;
@@ -903,6 +954,12 @@ var Camera = (function (_super) {
             y: this.centerOffset.y + coord.y - this.position.y
         };
     };
+    Camera.prototype.isSpriteVisible = function (coord, dimension) {
+        return coord.x + dimension.width >= 0 &&
+            coord.x <= this.dimensions.width &&
+            coord.y + dimension.height >= 0 &&
+            coord.y <= this.dimensions.height;
+    };
     Camera.prototype.animateTo = function (coord, time) {
         this.animationActive = true;
         this.animationCounter = 0;
@@ -918,64 +975,15 @@ var Camera = (function (_super) {
         this.position.x = coord.x;
         this.position.y = coord.y;
     };
+    Camera.prototype.renderAdjustedEntity = function (frame, sprite, position, layer) {
+        var coord = this.mapToScreenCoord(position);
+        if (this.isSpriteVisible(coord, sprite.dimensions)) {
+            sprite.render(frame, coord, layer);
+        }
+    };
     return Camera;
 }(game_entity_1["default"]));
 exports["default"] = Camera;
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-exports.__esModule = true;
-var game_entity_1 = __webpack_require__(1);
-var cursor_1 = __webpack_require__(20);
-var layers_1 = __webpack_require__(3);
-var Cursor = (function (_super) {
-    __extends(Cursor, _super);
-    function Cursor(parent, camera, gridPosition) {
-        var _this = _super.call(this, parent) || this;
-        _this.camera = camera;
-        _this.gridPosition = gridPosition;
-        _this.sprite = cursor_1.CURSOR_SPRITE;
-        _this.tileSize = _this.sprite.dimensions.width;
-        _this.halfTileSize = Math.floor(_this.tileSize / 2);
-        _this.calculatePositionCoordinates();
-        return _this;
-    }
-    Cursor.prototype.render = function (frame) {
-        var screenCoord = this.camera.mapToScreenCoord(this.position);
-        this.sprite.render(frame, screenCoord, layers_1.OVERLAY);
-    };
-    Cursor.prototype.moveTo = function (gridPosition) {
-        this.gridPosition = gridPosition;
-        this.calculatePositionCoordinates();
-    };
-    Cursor.prototype.calculatePositionCoordinates = function () {
-        this.center = {
-            x: this.gridPosition.x * this.tileSize,
-            y: this.gridPosition.y * this.tileSize
-        };
-        this.position = {
-            x: this.center.x - this.halfTileSize,
-            y: this.center.y - this.halfTileSize
-        };
-    };
-    return Cursor;
-}(game_entity_1["default"]));
-exports["default"] = Cursor;
 
 
 /***/ }),
@@ -996,26 +1004,43 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var game_entity_1 = __webpack_require__(1);
-var types_1 = __webpack_require__(5);
-var layers_1 = __webpack_require__(3);
-var Character = (function (_super) {
-    __extends(Character, _super);
-    function Character(parent, camera, sprite) {
+var types_1 = __webpack_require__(2);
+var cursor_1 = __webpack_require__(20);
+var layers_1 = __webpack_require__(4);
+var Cursor = /** @class */ (function (_super) {
+    __extends(Cursor, _super);
+    function Cursor(parent, camera, gridPosition) {
         var _this = _super.call(this, parent) || this;
         _this.camera = camera;
-        _this.sprite = sprite;
+        _this.gridPosition = gridPosition;
+        _this.sprite = cursor_1.CURSOR_SPRITE;
+        _this.tileSize = _this.sprite.dimensions.width;
+        _this.halfTileSize = Math.floor(_this.tileSize / 2);
+        _this.calculatePositionCoordinates();
         return _this;
     }
-    Character.prototype.moveToTile = function (tile) {
-        this.position = types_1.copyCoord(tile.position);
-    };
-    Character.prototype.render = function (frame) {
+    Cursor.prototype.render = function (frame) {
         var screenCoord = this.camera.mapToScreenCoord(this.position);
-        this.sprite.render(frame, screenCoord, layers_1.CHARACTER);
+        this.sprite.render(frame, screenCoord, layers_1.OVERLAY);
     };
-    return Character;
+    Cursor.prototype.moveTo = function (tile) {
+        this.activeTile = tile;
+        this.gridPosition = types_1.copyCoord(tile.gridPosition);
+        this.calculatePositionCoordinates();
+    };
+    Cursor.prototype.calculatePositionCoordinates = function () {
+        this.center = {
+            x: this.gridPosition.x * this.tileSize,
+            y: this.gridPosition.y * this.tileSize
+        };
+        this.position = {
+            x: this.center.x - this.halfTileSize,
+            y: this.center.y - this.halfTileSize
+        };
+    };
+    return Cursor;
 }(game_entity_1["default"]));
-exports["default"] = Character;
+exports["default"] = Cursor;
 
 
 /***/ }),
@@ -1036,107 +1061,47 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var game_entity_1 = __webpack_require__(1);
-var camera_1 = __webpack_require__(12);
-var cursor_1 = __webpack_require__(13);
-var clamp_1 = __webpack_require__(29);
-var empty_field_1 = __webpack_require__(11);
-var cell_grid_1 = __webpack_require__(2);
-var character_1 = __webpack_require__(14);
-var sword_girl_1 = __webpack_require__(19);
-var princess_1 = __webpack_require__(18);
-var LevelManager = (function (_super) {
-    __extends(LevelManager, _super);
-    function LevelManager(parent, dimensions) {
+var sprite_1 = __webpack_require__(0);
+var types_1 = __webpack_require__(2);
+var layers_1 = __webpack_require__(4);
+var Character = /** @class */ (function (_super) {
+    __extends(Character, _super);
+    function Character(parent, camera, sprite) {
         var _this = _super.call(this, parent) || this;
-        _this.dimensions = dimensions;
-        _this.movementClear = 0;
-        _this.movementDelay = 325;
-        _this.camera = new camera_1["default"](_this, dimensions);
-        _this.cursor = new cursor_1["default"](_this, _this.camera, empty_field_1.emptyFieldLevel.cursorStart);
-        _this.addChild(_this.camera);
-        _this.addChild(_this.cursor);
-        _this.buildLevelFromDefinition(empty_field_1.emptyFieldLevel);
-        var startPosition = _this.levelGrid.cellAt(empty_field_1.emptyFieldLevel.cursorStart);
-        _this.camera.moveTo(startPosition.center);
-        _this.sampleCharacter = new character_1["default"](_this, _this.camera, sword_girl_1.createSprite());
-        _this.addChild(_this.sampleCharacter);
-        _this.sampleCharacter.moveToTile(startPosition);
-        _this.sampleCharacter2 = new character_1["default"](_this, _this.camera, princess_1.createSprite());
-        _this.addChild(_this.sampleCharacter2);
-        _this.sampleCharacter2.moveToTile(_this.levelGrid.cellAt({
-            x: empty_field_1.emptyFieldLevel.cursorStart.x + 1,
-            y: empty_field_1.emptyFieldLevel.cursorStart.y
-        }));
+        _this.camera = camera;
+        _this.sprite = sprite;
+        _this.active = false;
+        _this.displayOffset = { x: 9, y: 6 };
+        _this.highlightSprite = sprite_1["default"].createHighlight(_this.sprite);
+        _this.model = {
+            movement: 3
+        };
         return _this;
     }
-    LevelManager.prototype.update = function (dtime, inputs) {
-        var _this = this;
-        _super.prototype.update.call(this, dtime, inputs);
-        this.movementClear += dtime;
-        if (this.movementClear > 0) {
-            inputs.forEach(function (input) {
-                if (input.INPUT_TYPE === "keyboard") {
-                    var direction = { x: 0, y: 0 };
-                    if (input.W) {
-                        direction.y += 1;
-                    }
-                    if (input.A) {
-                        direction.x -= 1;
-                    }
-                    if (input.S) {
-                        direction.y -= 1;
-                    }
-                    if (input.D) {
-                        direction.x += 1;
-                    }
-                    var newPosition = {
-                        x: clamp_1.clamp(_this.cursor.gridPosition.x + direction.x, 0, _this.levelDimensions.width - 1),
-                        y: clamp_1.clamp(_this.cursor.gridPosition.y + direction.y, 0, _this.levelDimensions.height - 1)
-                    };
-                    if (_this.isValidCursorTarget(newPosition)) {
-                        _this.movementClear = -_this.movementDelay;
-                        _this.cursor.moveTo(newPosition);
-                        _this.camera.animateTo(_this.cursor.center, _this.movementDelay);
-                    }
-                }
-            });
+    Character.prototype.moveToTile = function (tile) {
+        this.containingTile = tile;
+        this.position = types_1.addCoords(tile.position, this.displayOffset);
+        this.highlightPosition = types_1.addCoords(this.position, { x: 1, y: 1 });
+        tile.addEntityToTile(this);
+    };
+    Character.prototype.render = function (frame) {
+        if (this.active) {
+            this.camera.renderAdjustedEntity(frame, this.highlightSprite, this.position, layers_1.CHARACTER);
+        }
+        this.camera.renderAdjustedEntity(frame, this.sprite, this.highlightPosition, layers_1.CHARACTER);
+    };
+    Character.prototype.toggleActive = function () {
+        this.active = !this.active;
+        if (this.active) {
+            this.parent.sendEvent('showMovementTemplateForUnit', this);
         }
         else {
-            inputs.forEach(function (input) {
-                if (input.INPUT_TYPE === "keyboard") {
-                    if (!input.W && !input.A && !input.S && !input.D) {
-                        _this.movementClear = 1;
-                    }
-                }
-            });
+            this.parent.sendEvent('clearMovementTemplates');
         }
     };
-    LevelManager.prototype.isValidCursorTarget = function (target) {
-        return (target.x !== this.cursor.gridPosition.x ||
-            target.y !== this.cursor.gridPosition.y) &&
-            !this.levelGrid.cellAt(target).border_tile;
-    };
-    LevelManager.prototype.buildLevelFromDefinition = function (level) {
-        var height = level.tiles.length;
-        var width = level.tiles[0].length;
-        this.levelDimensions = { width: width, height: height };
-        this.levelGrid = new cell_grid_1["default"](this.levelDimensions);
-        this.levelGrid.cells = [];
-        for (var x = 0; x < width; x++) {
-            this.levelGrid.cells[x] = [];
-            for (var y = 0; y < height; y++) {
-                /* note: level definitions and the level grid have rows and columns inverted from each other, hence why the
-                 * lookups are swapped here. */
-                var TileType = level.tiles[y][x];
-                var tile = new TileType(this, this.camera, { x: x, y: y });
-                this.levelGrid.cells[x][y] = tile;
-                this.addChild(tile);
-            }
-        }
-    };
-    return LevelManager;
+    return Character;
 }(game_entity_1["default"]));
-exports["default"] = LevelManager;
+exports["default"] = Character;
 
 
 /***/ }),
@@ -1156,25 +1121,151 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var level_tile_1 = __webpack_require__(4);
-var grass_empty_1 = __webpack_require__(21);
-var grass_sparse_1 = __webpack_require__(22);
-var grass_thick_1 = __webpack_require__(23);
-var random_1 = __webpack_require__(30);
-var SPRITES = [
-    grass_empty_1.createSprite,
-    grass_empty_1.createSprite,
-    grass_sparse_1.createSprite,
-    grass_thick_1.createSprite
-];
-var GrassTile = (function (_super) {
-    __extends(GrassTile, _super);
-    function GrassTile(parent, camera, gridPosition) {
-        return _super.call(this, parent, camera, random_1.randomElement(SPRITES)(), gridPosition) || this;
+var game_entity_1 = __webpack_require__(1);
+var camera_1 = __webpack_require__(13);
+var types_1 = __webpack_require__(2);
+var cursor_1 = __webpack_require__(14);
+var empty_field_1 = __webpack_require__(12);
+var cell_grid_1 = __webpack_require__(3);
+var unit_1 = __webpack_require__(15);
+var sword_girl_1 = __webpack_require__(19);
+var zip_1 = __webpack_require__(5);
+var KEYBOARD = 0;
+var LevelManager = /** @class */ (function (_super) {
+    __extends(LevelManager, _super);
+    function LevelManager(parent, dimensions) {
+        var _this = _super.call(this, parent) || this;
+        _this.dimensions = dimensions;
+        _this.movementClear = 0;
+        _this.movementDelay = 325;
+        _this.selectActive = false;
+        _this.camera = new camera_1["default"](_this, dimensions);
+        _this.cursor = new cursor_1["default"](_this, _this.camera, empty_field_1.emptyFieldLevel.cursorStart);
+        _this.addChild(_this.camera);
+        _this.addChild(_this.cursor);
+        _this.buildLevelFromDefinition(empty_field_1.emptyFieldLevel);
+        var startPosition = _this.levelGrid.cellAt(empty_field_1.emptyFieldLevel.cursorStart);
+        _this.camera.moveTo(startPosition.center);
+        _this.sampleCharacter = new unit_1["default"](_this, _this.camera, sword_girl_1.SWORD_GIRL_CHARACTER_SPRITE);
+        _this.addChild(_this.sampleCharacter);
+        _this.sampleCharacter.moveToTile(startPosition);
+        return _this;
     }
-    return GrassTile;
-}(level_tile_1["default"]));
-exports["default"] = GrassTile;
+    LevelManager.prototype.update = function (dtime, inputs) {
+        _super.prototype.update.call(this, dtime, inputs);
+        var input = inputs[KEYBOARD];
+        if (!this.selectActive) {
+            if (input.ENTER) {
+                this.selectActive = true;
+                this.selectCursorLocation();
+            }
+        }
+        else {
+            if (!input.ENTER) {
+                this.selectActive = false;
+            }
+        }
+        this.movementClear += dtime;
+        if (this.movementClear > 0) {
+            var direction = { x: 0, y: 0 };
+            if (input.W) {
+                direction.y += 1;
+            }
+            if (input.A) {
+                direction.x -= 1;
+            }
+            if (input.S) {
+                direction.y -= 1;
+            }
+            if (input.D) {
+                direction.x += 1;
+            }
+            var newTile = this.levelGrid.cellAt({
+                x: this.cursor.gridPosition.x + direction.x,
+                y: this.cursor.gridPosition.y + direction.y
+            });
+            if (newTile && newTile !== this.cursor.activeTile && !newTile.border_tile) {
+                this.movementClear = -this.movementDelay;
+                this.cursor.moveTo(newTile);
+                this.camera.animateTo(this.cursor.center, this.movementDelay);
+            }
+        }
+        else if (!input.W && !input.A && !input.S && !input.D) {
+            this.movementClear = 1;
+        }
+    };
+    LevelManager.prototype.buildLevelFromDefinition = function (level) {
+        var height = level.tiles.length;
+        var width = level.tiles[0].length;
+        this.levelDimensions = { width: width, height: height };
+        this.levelGrid = new cell_grid_1["default"](this.levelDimensions);
+        this.levelGrid.cells = [];
+        for (var x = 0; x < width; x++) {
+            this.levelGrid.cells[x] = [];
+            for (var y = 0; y < height; y++) {
+                /* note: level definitions and the level grid have rows and columns inverted from each other, hence why the
+                 * lookups are swapped here. */
+                var TileType = level.tiles[y][x];
+                var tile = new TileType(this, this.camera, { x: x, y: y });
+                this.levelGrid.cells[x][y] = tile;
+                this.addChild(tile);
+            }
+        }
+    };
+    LevelManager.prototype.selectCursorLocation = function () {
+        var entity = this.cursor.activeTile.containedEntity;
+        if (entity) {
+            entity.sendEvent('toggleActive');
+        }
+    };
+    LevelManager.prototype.showMovementTemplateForUnit = function (unitEntity) {
+        var _this = this;
+        var center = unitEntity.containingTile.gridPosition;
+        var distance = unitEntity.model.movement;
+        var highlightedTiles = [];
+        var queue = [{
+                coord: center,
+                remainingMove: distance
+            }];
+        var visitTile = function () {
+            var next = queue.shift();
+            var tile = _this.levelGrid.cellAt(next.coord);
+            if (tile && !tile.showHighlightBorders && !tile.border_tile) {
+                tile.showHighlightBorders = true;
+                tile.resetHighlightBorders();
+                highlightedTiles.push(tile);
+                if (next.remainingMove > 0) {
+                    var neighbors = types_1.coordNeighbors(next.coord);
+                    neighbors.forEach(function (coord) { return queue.push({
+                        coord: coord, remainingMove: next.remainingMove - 1
+                    }); });
+                }
+            }
+            if (queue.length > 0) {
+                visitTile();
+            }
+        };
+        visitTile();
+        highlightedTiles.forEach(function (tile) {
+            var neighbors = zip_1.zip(types_1.ORDINALS, types_1.coordNeighbors(tile.gridPosition)
+                .map(function (coord) {
+                return _this.levelGrid.cellAt(coord);
+            }));
+            types_1.ORDINALS.forEach(function (direction) {
+                if (neighbors[direction].showHighlightBorders) {
+                    tile.visibleHighlightBorders[direction] = false;
+                }
+            });
+        });
+    };
+    LevelManager.prototype.clearMovementTemplates = function () {
+        this.levelGrid.iterateCells(function (tile) {
+            tile.showHighlightBorders = false;
+        });
+    };
+    return LevelManager;
+}(game_entity_1["default"]));
+exports["default"] = LevelManager;
 
 
 /***/ }),
@@ -1194,18 +1285,25 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var level_tile_1 = __webpack_require__(4);
-var pines_1 = __webpack_require__(24);
-var WoodsTile = (function (_super) {
-    __extends(WoodsTile, _super);
-    function WoodsTile(parent, camera, gridPosition) {
-        var _this = _super.call(this, parent, camera, pines_1.createSprite(), gridPosition) || this;
-        _this.border_tile = true;
-        return _this;
+var level_tile_1 = __webpack_require__(6);
+var grass_empty_1 = __webpack_require__(22);
+var grass_sparse_1 = __webpack_require__(23);
+var grass_thick_1 = __webpack_require__(24);
+var random_1 = __webpack_require__(30);
+var SPRITES = [
+    grass_empty_1.GRASS_EMPTY_TILE_SPRITE,
+    grass_empty_1.GRASS_EMPTY_TILE_SPRITE,
+    grass_sparse_1.GRASS_SPARSE_TILE_SPRITE,
+    grass_thick_1.GRASS_THICK_TILE_SPRITE
+];
+var GrassTile = /** @class */ (function (_super) {
+    __extends(GrassTile, _super);
+    function GrassTile(parent, camera, gridPosition) {
+        return _super.call(this, parent, camera, random_1.randomElement(SPRITES), gridPosition) || this;
     }
-    return WoodsTile;
+    return GrassTile;
 }(level_tile_1["default"]));
-exports["default"] = WoodsTile;
+exports["default"] = GrassTile;
 
 
 /***/ }),
@@ -1214,14 +1312,29 @@ exports["default"] = WoodsTile;
 
 "use strict";
 
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 exports.__esModule = true;
-var sprite_1 = __webpack_require__(0);
-var pixels = [[null, null, null, null, null, null, null, null, null, null, null, null, null, "#000000", "#000000", "#000000", null, null, "#000000", "#000000", "#000000", null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, "#000000", "#E38836", "#E38836", "#E38836", "#000000", "#000000", "#E38836", "#E38836", "#E38836", "#000000", null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, "#000000", "#FFF700", "#000000", "#E38836", "#E38836", "#E38836", "#000000", "#E38836", "#E38836", "#000000", "#FFF700", "#000000", null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, "#000000", "#E38836", "#000000", "#FFF700", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#FFF700", "#000000", "#E38836", "#000000", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, "#000000", "#E38836", "#E38836", "#E38836", "#000000", "#FFF700", "#FFF700", "#9BFF78", "#9BFF78", "#FFF700", "#FFF700", "#000000", "#E38836", "#E38836", "#E38836", "#000000", null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, "#000000", "#E38836", "#E38836", "#E38836", "#E38836", "#000000", "#000000", "#FFF700", "#FFF700", "#000000", "#000000", "#E38836", "#E38836", "#E38836", "#E38836", "#000000", null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, "#000000", "#000000", "#E38836", "#E38836", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#E38836", "#E38836", "#000000", "#000000", null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#000000", "#E38836", "#000000", "#E38836", "#000000", "#C69B5B", "#FCFCFC", "#FCFCFC", "#FDDBA6", "#FDDBA6", "#FCFCFC", "#FCFCFC", "#C69B5B", "#000000", "#E38836", "#000000", "#E38836", "#000000", null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#000000", "#E38836", "#000000", "#E38836", "#000000", "#FDDBA6", "#000000", "#FCFCFC", "#FDDBA6", "#FDDBA6", "#000000", "#FCFCFC", "#FDDBA6", "#000000", "#E38836", "#000000", "#E38836", "#000000", null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#000000", "#E38836", "#E38836", "#000000", "#000000", "#FDDBA6", "#000000", "#FCFCFC", "#FDDBA6", "#FDDBA6", "#000000", "#FCFCFC", "#FDDBA6", "#000000", "#000000", "#E38836", "#E38836", "#000000", null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#000000", "#E38836", "#E38836", "#E38836", "#000000", "#C69B5B", "#FDDBA6", "#FDDBA6", "#FDDBA6", "#FDDBA6", "#FDDBA6", "#FDDBA6", "#C69B5B", "#000000", "#E38836", "#E38836", "#E38836", "#000000", null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, "#000000", "#E38836", "#E38836", "#E38836", "#000000", "#C69B5B", "#FDDBA6", "#FDDBA6", "#FDDBA6", "#FDDBA6", "#C69B5B", "#000000", "#E38836", "#E38836", "#E38836", "#000000", null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#000000", "#E38836", "#000000", "#E38836", "#000000", "#000000", "#000000", "#C69B5B", "#C69B5B", "#FDDBA6", "#FDDBA6", "#000000", "#000000", "#000000", "#E38836", "#000000", "#E38836", "#000000", null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#000000", "#E38836", "#E38836", "#000000", "#E0C1E0", "#FCFCFC", "#E0C1E0", "#000000", "#000000", "#000000", "#000000", "#E0C1E0", "#FCFCFC", "#E0C1E0", "#000000", "#E38836", "#E38836", "#000000", null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#000000", "#E38836", "#E38836", "#000000", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#000000", "#000000", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#000000", "#E38836", "#E38836", "#000000", null, null, null, null, null, null], [null, null, null, null, null, null, null, "#000000", "#E38836", "#000000", "#E38836", "#000000", "#000000", "#000000", "#000000", "#000000", "#E0C1E0", "#E0C1E0", "#000000", "#000000", "#000000", "#000000", "#000000", "#E38836", "#000000", "#E38836", "#000000", null, null, null, null, null], [null, null, null, null, null, null, null, "#000000", "#E38836", "#000000", "#000000", "#000000", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#000000", "#000000", "#000000", "#E38836", "#000000", null, null, null, null, null], [null, null, null, null, null, null, null, "#000000", "#E38836", "#E38836", "#000000", "#000000", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#000000", "#000000", "#E38836", "#E38836", "#000000", null, null, null, null, null], [null, null, null, null, null, null, "#000000", "#000000", "#E38836", "#E38836", "#000000", "#000000", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#000000", "#000000", "#E38836", "#E38836", "#000000", "#000000", null, null, null, null], [null, null, null, null, null, null, "#000000", "#E38836", "#E38836", "#000000", "#E0C1E0", "#000000", "#000000", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#000000", "#000000", "#E0C1E0", "#000000", "#E38836", "#E38836", "#000000", null, null, null, null], [null, null, null, null, null, null, "#000000", "#E38836", "#000000", "#000000", "#000000", "#E0C1E0", "#000000", "#FFB3B3", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#FFB3B3", "#000000", "#E0C1E0", "#000000", "#000000", "#000000", "#E38836", "#000000", null, null, null, null], [null, null, null, null, null, "#000000", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#000000", "#FFB3B3", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#FFB3B3", "#000000", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#000000", null, null, null], [null, null, null, null, "#000000", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#000000", "#FFB3B3", "#FFB3B3", "#FFB3B3", "#FFB3B3", "#000000", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#000000", null, null], [null, null, null, null, null, "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", null, null, null], [null, null, null, null, null, null, "#000000", "#000000", "#000000", "#000000", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#000000", "#000000", "#000000", "#000000", null, null, null, null], [null, null, null, null, null, null, null, null, null, "#000000", "#000000", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#000000", "#000000", null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, "#000000", "#000000", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#000000", "#E0C1E0", "#E0C1E0", "#E0C1E0", "#000000", "#000000", "#000000", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", "#000000", null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, "#000000", "#000000", "#000000", null, null, "#000000", "#000000", "#000000", null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]];
-function createSprite() {
-    return sprite_1["default"].newFromColorSheet(pixels);
-}
-exports.createSprite = createSprite;
-exports.PRINCESS_SPRITE = createSprite();
+var level_tile_1 = __webpack_require__(6);
+var pines_1 = __webpack_require__(25);
+var WoodsTile = /** @class */ (function (_super) {
+    __extends(WoodsTile, _super);
+    function WoodsTile(parent, camera, gridPosition) {
+        var _this = _super.call(this, parent, camera, pines_1.PINES_TILE_SPRITE, gridPosition) || this;
+        _this.border_tile = true;
+        return _this;
+    }
+    return WoodsTile;
+}(level_tile_1["default"]));
+exports["default"] = WoodsTile;
 
 
 /***/ }),
@@ -1236,15 +1349,12 @@ var IMPORTED_SPRITE_DATA = {
     "schema": 2,
     "name": "sword girl low res",
     "whiteAsEmpty": true,
-    "width": 20,
-    "height": 20,
-    "frames": [[[null, null, null, null, null, null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null, null, null, null, null], [null, null, null, null, null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null, null, null, null, null], [null, null, null, null, null, null, null, "#fff821", "#fd9d80", "#fd9d80", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null, null, null, null, null], [null, null, null, null, null, null, null, "#fff821", "#fd9d80", "#abd8ff", "#fd9d80", "#fff821", "#fff821", null, "#c0c0c0", null, null, null, null, null], [null, null, null, null, null, null, null, "#fff821", "#fd9d80", "#fd9d80", "#fd9d80", "#fd9d80", "#fff821", null, "#c0c0c0", null, null, null, null, null], [null, null, null, null, null, null, "#fff821", "#fff821", "#fd9d80", "#fd9d80", "#ff0000", "#fd9d80", "#fff821", "#fff821", "#c0c0c0", null, null, null, null, null], [null, null, null, null, null, "#c02213", "#c02213", "#c02213", "#7aafff", "#fd9d80", "#fd9d80", "#7aafff", null, null, "#c0c0c0", null, null, null, null, null], [null, null, null, null, "#c02213", "#c02213", "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#fd9d80", null, "#c0c0c0", null, null, null, null, null], [null, null, null, null, "#c02213", "#c02213", "#c0c0c0", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#fd9d80", "#c02213", "#c02213", "#c02213", null, null, null, null], [null, null, null, null, "#c02213", "#c0c0c0", "#c02213", "#c0c0c0", "#c02213", "#7aafff", "#7aafff", "#7aafff", null, "#fd9d80", "#fd9d80", null, null, null, null, null], [null, null, null, null, "#c02213", "#c02213", "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", null, null, "#c02213", null, null, null, null, null], [null, null, null, null, null, "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#7aafff", "#7aafff", null, null, null, null, null, null, null], [null, null, null, null, null, null, "#c02213", null, "#fd9d80", null, null, "#fd9d80", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#fd9d80", null, null, "#fd9d80", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#fd9d80", null, null, "#fd9d80", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#fd9d80", null, null, "#fd9d80", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "#3b0000", null, null, "#3b0000", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]]]
+    "width": 12,
+    "height": 18,
+    "frames": [[[null, null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", null, null, null, null], [null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fd9d80", "#fd9d80", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fd9d80", "#abd8ff", "#fd9d80", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fd9d80", "#fd9d80", "#fd9d80", "#fd9d80", "#fff821", null, "#c0c0c0", null], [null, null, "#fff821", "#fff821", "#fd9d80", "#fd9d80", "#ff0000", "#fd9d80", "#fff821", "#fff821", "#c0c0c0", null], [null, "#c02213", "#c02213", "#c02213", "#7aafff", "#fd9d80", "#fd9d80", "#7aafff", null, null, "#c0c0c0", null], ["#c02213", "#c02213", "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#fd9d80", null, "#c0c0c0", null], ["#c02213", "#c02213", "#c0c0c0", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#fd9d80", "#c02213", "#c02213", "#c02213"], ["#c02213", "#c0c0c0", "#c02213", "#c0c0c0", "#c02213", "#7aafff", "#7aafff", "#7aafff", null, "#fd9d80", "#fd9d80", null], ["#c02213", "#c02213", "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", null, null, "#c02213", null], [null, "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#7aafff", "#7aafff", null, null, null], [null, null, "#c02213", null, "#fd9d80", null, null, "#fd9d80", null, null, null, null], [null, null, null, null, "#fd9d80", null, null, "#fd9d80", null, null, null, null], [null, null, null, null, "#fd9d80", null, null, "#fd9d80", null, null, null, null], [null, null, null, null, "#fd9d80", null, null, "#fd9d80", null, null, null, null], [null, null, null, null, "#3b0000", null, null, "#3b0000", null, null, null, null]], [[null, null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", null, null, null, null], [null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fd9d80", "#fd9d80", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fd9d80", "#abd8ff", "#fd9d80", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fd9d80", "#fd9d80", "#fd9d80", "#fd9d80", "#fff821", null, "#c0c0c0", null], [null, null, "#fff821", "#fff821", "#fd9d80", "#fd9d80", "#ff0000", "#fd9d80", "#fff821", "#fff821", "#c0c0c0", null], [null, "#c02213", "#c02213", "#c02213", "#7aafff", "#fd9d80", "#fd9d80", "#7aafff", null, null, "#c0c0c0", null], ["#c02213", "#c02213", "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#fd9d80", null, "#c0c0c0", null], ["#c02213", "#c02213", "#c0c0c0", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#fd9d80", "#c02213", "#c02213", "#c02213"], ["#c02213", "#c0c0c0", "#c02213", "#c0c0c0", "#c02213", "#7aafff", "#7aafff", "#7aafff", null, "#fd9d80", "#fd9d80", null], ["#c02213", "#c02213", "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", null, null, "#c02213", null], [null, "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#7aafff", "#7aafff", null, null, null], [null, null, "#c02213", null, "#fd9d80", null, null, null, "#fd9d80", null, null, null], [null, null, null, null, "#fd9d80", null, null, null, "#fd9d80", null, null, null], [null, null, null, null, "#fd9d80", null, null, null, "#fd9d80", null, null, null], [null, null, null, null, "#fd9d80", null, null, null, "#fd9d80", null, null, null], [null, null, null, null, "#3b0000", null, null, null, "#3b0000", null, null, null]], [[null, null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", null, null, null, null], [null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fd9d80", "#fd9d80", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fd9d80", "#abd8ff", "#fd9d80", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fd9d80", "#fd9d80", "#fd9d80", "#fd9d80", "#fff821", null, "#c0c0c0", null], [null, null, "#fff821", "#fff821", "#fd9d80", "#fd9d80", "#ff0000", "#fd9d80", "#fff821", "#fff821", "#c0c0c0", null], [null, "#c02213", "#c02213", "#c02213", "#7aafff", "#fd9d80", "#fd9d80", "#7aafff", null, null, "#c0c0c0", null], ["#c02213", "#c02213", "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#fd9d80", null, "#c0c0c0", null], ["#c02213", "#c02213", "#c0c0c0", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#fd9d80", "#c02213", "#c02213", "#c02213"], ["#c02213", "#c0c0c0", "#c02213", "#c0c0c0", "#c02213", "#7aafff", "#7aafff", "#7aafff", null, "#fd9d80", "#fd9d80", null], ["#c02213", "#c02213", "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", null, null, "#c02213", null], [null, "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#7aafff", "#7aafff", null, null, null], [null, null, "#c02213", null, "#fd9d80", null, null, "#fd9d80", null, null, null, null], [null, null, null, null, "#fd9d80", null, null, "#fd9d80", null, null, null, null], [null, null, null, null, "#fd9d80", null, null, "#fd9d80", null, null, null, null], [null, null, null, null, "#fd9d80", null, null, "#fd9d80", null, null, null, null], [null, null, null, null, "#3b0000", null, null, "#3b0000", null, null, null, null]], [[null, null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", null, null, null, null], [null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fd9d80", "#fd9d80", "#fff821", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fd9d80", "#abd8ff", "#fd9d80", "#fff821", "#fff821", null, "#c0c0c0", null], [null, null, null, "#fff821", "#fd9d80", "#fd9d80", "#fd9d80", "#fd9d80", "#fff821", null, "#c0c0c0", null], [null, null, "#fff821", "#fff821", "#fd9d80", "#fd9d80", "#ff0000", "#fd9d80", "#fff821", "#fff821", "#c0c0c0", null], [null, "#c02213", "#c02213", "#c02213", "#7aafff", "#fd9d80", "#fd9d80", "#7aafff", null, null, "#c0c0c0", null], ["#c02213", "#c02213", "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#fd9d80", null, "#c0c0c0", null], ["#c02213", "#c02213", "#c0c0c0", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#fd9d80", "#c02213", "#c02213", "#c02213"], ["#c02213", "#c0c0c0", "#c02213", "#c0c0c0", "#c02213", "#7aafff", "#7aafff", "#7aafff", null, "#fd9d80", "#fd9d80", null], ["#c02213", "#c02213", "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", null, null, "#c02213", null], [null, "#c02213", "#c02213", "#c02213", "#7aafff", "#7aafff", "#7aafff", "#7aafff", "#7aafff", null, null, null], [null, null, "#c02213", null, "#fd9d80", null, "#fd9d80", null, null, null, null, null], [null, null, null, null, "#fd9d80", null, "#fd9d80", null, null, null, null, null], [null, null, null, null, "#fd9d80", null, "#fd9d80", null, null, null, null, null], [null, null, null, null, "#fd9d80", null, "#fd9d80", null, null, null, null, null], [null, null, null, null, "#3b0000", null, "#3b0000", null, null, null, null, null]]]
 };
 var pixels = IMPORTED_SPRITE_DATA.frames[0];
-function createSprite() {
-    return sprite_1["default"].newFromColorSheet(pixels);
-}
-exports.createSprite = createSprite;
+exports.SWORD_GIRL_CHARACTER_SPRITE = sprite_1["default"].newFromColorSheet(pixels);
 
 
 /***/ }),
@@ -1256,11 +1366,7 @@ exports.createSprite = createSprite;
 exports.__esModule = true;
 var sprite_1 = __webpack_require__(0);
 var pixels = [[null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null], [null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null], ["#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252"], ["#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252"], ["#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252"], ["#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252"], [null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null], [null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", "#FF5252", null, null]];
-function createCursorSprite() {
-    return sprite_1["default"].newFromColorSheet(pixels);
-}
-exports.createCursorSprite = createCursorSprite;
-exports.CURSOR_SPRITE = createCursorSprite();
+exports.CURSOR_SPRITE = sprite_1["default"].newFromColorSheet(pixels);
 
 
 /***/ }),
@@ -1271,19 +1377,26 @@ exports.CURSOR_SPRITE = createCursorSprite();
 
 exports.__esModule = true;
 var sprite_1 = __webpack_require__(0);
+var types_1 = __webpack_require__(2);
+var zip_1 = __webpack_require__(5);
 var IMPORTED_SPRITE_DATA = {
     "schema": 2,
-    "name": "plain-grass",
+    "name": "Borders",
     "whiteAsEmpty": true,
     "width": 32,
     "height": 32,
-    "frames": [[["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"]]]
+    "frames": [[["#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]], [[null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "#ffc4eb"]], [[null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb", "#ffc4eb"]], [["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], ["#ffc4eb", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]]]
 };
-var pixels = IMPORTED_SPRITE_DATA.frames[0];
-function createSprite() {
-    return sprite_1["default"].newFromColorSheet(pixels);
-}
-exports.createSprite = createSprite;
+exports.BORDER_TOP = sprite_1["default"].newFromColorSheet(IMPORTED_SPRITE_DATA.frames[0]);
+exports.BORDER_RIGHT = sprite_1["default"].newFromColorSheet(IMPORTED_SPRITE_DATA.frames[1]);
+exports.BORDER_BOTTOM = sprite_1["default"].newFromColorSheet(IMPORTED_SPRITE_DATA.frames[2]);
+exports.BORDER_LEFT = sprite_1["default"].newFromColorSheet(IMPORTED_SPRITE_DATA.frames[3]);
+exports.BORDER_SPRITES = zip_1.zip(types_1.ORDINALS, [
+    exports.BORDER_TOP,
+    exports.BORDER_RIGHT,
+    exports.BORDER_BOTTOM,
+    exports.BORDER_LEFT
+]);
 
 
 /***/ }),
@@ -1300,13 +1413,10 @@ var IMPORTED_SPRITE_DATA = {
     "whiteAsEmpty": true,
     "width": 32,
     "height": 32,
-    "frames": [[["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"]]]
+    "frames": [[["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"]]]
 };
 var pixels = IMPORTED_SPRITE_DATA.frames[0];
-function createSprite() {
-    return sprite_1["default"].newFromColorSheet(pixels);
-}
-exports.createSprite = createSprite;
+exports.GRASS_EMPTY_TILE_SPRITE = sprite_1["default"].newFromColorSheet(pixels);
 
 
 /***/ }),
@@ -1323,17 +1433,34 @@ var IMPORTED_SPRITE_DATA = {
     "whiteAsEmpty": true,
     "width": 32,
     "height": 32,
-    "frames": [[["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a"], ["#4bb43f", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a"], ["#4bb43f", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#2daa2d", "#7fc45a"], ["#4bb43f", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"]]]
+    "frames": [[["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"]]]
 };
 var pixels = IMPORTED_SPRITE_DATA.frames[0];
-function createSprite() {
-    return sprite_1["default"].newFromColorSheet(pixels);
-}
-exports.createSprite = createSprite;
+exports.GRASS_SPARSE_TILE_SPRITE = sprite_1["default"].newFromColorSheet(pixels);
 
 
 /***/ }),
 /* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var sprite_1 = __webpack_require__(0);
+var IMPORTED_SPRITE_DATA = {
+    "schema": 2,
+    "name": "plain-grass",
+    "whiteAsEmpty": true,
+    "width": 32,
+    "height": 32,
+    "frames": [[["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a"], ["#7fc45a", "#4bb43f", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#2daa2d"], ["#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a"], ["#4bb43f", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a"], ["#4bb43f", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#2daa2d", "#7fc45a"], ["#4bb43f", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a"], ["#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#2daa2d", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#4bb43f", "#4bb43f", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"]]]
+};
+var pixels = IMPORTED_SPRITE_DATA.frames[0];
+exports.GRASS_THICK_TILE_SPRITE = sprite_1["default"].newFromColorSheet(pixels);
+
+
+/***/ }),
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1349,24 +1476,21 @@ var IMPORTED_SPRITE_DATA = {
     "frames": [[["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#339c22", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#339c22", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#339c22", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#339c22", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#339c22", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#339c22", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#339c22", "#339c22", "#339c22", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#339c22", "#339c22", "#339c22", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#339c22", "#339c22", "#339c22", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#339c22", "#339c22", "#2daa2d", "#339c22", "#339c22", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#339c22", "#339c22", "#2daa2d", "#339c22", "#339c22", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#339c22", "#339c22", "#2daa2d", "#339c22", "#339c22", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a"], ["#7fc45a", "#13871e", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#13871e", "#7fc45a", "#7fc45a", "#13871e", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#13871e", "#7fc45a", "#13871e", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#13871e", "#7fc45a"], ["#7fc45a", "#13871e", "#339c22", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#339c22", "#13871e", "#7fc45a", "#13871e", "#339c22", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#339c22", "#13871e", "#7fc45a"], ["#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a"], ["#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a"], ["#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#7fc45a"], ["#13871e", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#4bb43f", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#13871e", "#13871e", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#4bb43f", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#13871e", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#4bb43f", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#13871e"], ["#13871e", "#339c22", "#339c22", "#2daa2d", "#2daa2d", "#4bb43f", "#2daa2d", "#2daa2d", "#339c22", "#339c22", "#13871e", "#13871e", "#339c22", "#339c22", "#2daa2d", "#2daa2d", "#4bb43f", "#2daa2d", "#2daa2d", "#339c22", "#339c22", "#13871e", "#339c22", "#339c22", "#2daa2d", "#2daa2d", "#4bb43f", "#2daa2d", "#2daa2d", "#339c22", "#339c22", "#13871e"], ["#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#4bb43f", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#4bb43f", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#4bb43f", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#13871e"], ["#339c22", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#339c22", "#339c22", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#339c22", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#339c22"], ["#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#918564", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#918564", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22", "#918564", "#339c22", "#2daa2d", "#2daa2d", "#2daa2d", "#339c22"], ["#339c22", "#2daa2d", "#2daa2d", "#339c22", "#918564", "#70674d", "#918564", "#339c22", "#2daa2d", "#2daa2d", "#339c22", "#339c22", "#2daa2d", "#2daa2d", "#339c22", "#918564", "#70674d", "#918564", "#339c22", "#2daa2d", "#2daa2d", "#339c22", "#2daa2d", "#2daa2d", "#339c22", "#918564", "#70674d", "#918564", "#339c22", "#2daa2d", "#2daa2d", "#339c22"], ["#339c22", "#339c22", "#339c22", "#13871e", "#918564", "#70674d", "#918564", "#13871e", "#339c22", "#339c22", "#339c22", "#339c22", "#339c22", "#339c22", "#13871e", "#918564", "#70674d", "#918564", "#13871e", "#339c22", "#339c22", "#339c22", "#339c22", "#339c22", "#13871e", "#918564", "#70674d", "#918564", "#13871e", "#339c22", "#339c22", "#339c22"], ["#13871e", "#13871e", "#13871e", "#7fc45a", "#918564", "#70674d", "#918564", "#7fc45a", "#13871e", "#13871e", "#13871e", "#13871e", "#13871e", "#13871e", "#7fc45a", "#918564", "#70674d", "#918564", "#7fc45a", "#13871e", "#13871e", "#13871e", "#13871e", "#13871e", "#7fc45a", "#918564", "#70674d", "#918564", "#7fc45a", "#13871e", "#13871e", "#13871e"], ["#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#70674d", "#918564", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#70674d", "#918564", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#70674d", "#918564", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#918564", "#70674d", "#918564", "#918564", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#918564", "#70674d", "#918564", "#918564", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#918564", "#70674d", "#918564", "#918564", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#70674d", "#70674d", "#70674d", "#918564", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#70674d", "#70674d", "#70674d", "#918564", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#70674d", "#70674d", "#70674d", "#918564", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#70674d", "#70674d", "#70674d", "#918564", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#70674d", "#70674d", "#70674d", "#918564", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#70674d", "#70674d", "#70674d", "#918564", "#7fc45a", "#7fc45a", "#7fc45a"], ["#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#918564", "#918564", "#918564", "#918564", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#918564", "#918564", "#918564", "#918564", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#7fc45a", "#918564", "#918564", "#918564", "#918564", "#918564", "#7fc45a", "#7fc45a", "#7fc45a"]]]
 };
 var pixels = IMPORTED_SPRITE_DATA.frames[0];
-function createSprite() {
-    return sprite_1["default"].newFromColorSheet(pixels);
-}
-exports.createSprite = createSprite;
+exports.PINES_TILE_SPRITE = sprite_1["default"].newFromColorSheet(pixels);
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var game_1 = __webpack_require__(6);
-var run_loop_1 = __webpack_require__(9);
-var webgl_1 = __webpack_require__(10);
-var keyboard_input_1 = __webpack_require__(8);
-var gamepad_input_1 = __webpack_require__(7);
+var game_1 = __webpack_require__(7);
+var run_loop_1 = __webpack_require__(10);
+var webgl_1 = __webpack_require__(11);
+var keyboard_input_1 = __webpack_require__(9);
+var gamepad_input_1 = __webpack_require__(8);
 var dimensions = {
     width: 250,
     height: 150
@@ -1398,16 +1522,18 @@ window.addEventListener("focus", function () {
     inputs.forEach(function (input) { return input.clearState(); });
     runLoop.start();
 });
+window['$game'] = game;
+window['$runloop'] = runLoop;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var RGBColor = (function () {
+var RGBColor = /** @class */ (function () {
     function RGBColor(r, g, b) {
         if (r === void 0) { r = 0; }
         if (g === void 0) { g = 0; }
@@ -1440,6 +1566,7 @@ var RGBColor = (function () {
         return "#" + this.getR() + this.getG() + this.getB();
     };
     RGBColor.prototype.copyFromColor = function (color) {
+        this.clear = color.clear;
         this.setR(color.getR());
         this.setG(color.getG());
         this.setB(color.getB());
@@ -1464,6 +1591,7 @@ var RGBColor = (function () {
         this.setR(parseInt(hex.slice(0, 2), 16));
         this.setG(parseInt(hex.slice(2, 4), 16));
         this.setB(parseInt(hex.slice(4, 6), 16));
+        this.clear = false;
     };
     RGBColor.prototype.clone = function () {
         return new RGBColor(this.getR(), this.getG(), this.getB());
@@ -1479,7 +1607,7 @@ exports["default"] = RGBColor;
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1495,10 +1623,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var BufferColor = (function () {
+var BufferColor = /** @class */ (function () {
     function BufferColor(vertexGroup, colorBufferOffset) {
         this.vertexGroup = vertexGroup;
         this.colorBufferOffset = colorBufferOffset;
+        this.clear = false;
         this.r = 0;
         this.g = 0;
         this.b = 0;
@@ -1545,7 +1674,7 @@ var BufferColor = (function () {
     return BufferColor;
 }());
 exports["default"] = BufferColor;
-var FakeBufferColor = (function (_super) {
+var FakeBufferColor = /** @class */ (function (_super) {
     __extends(FakeBufferColor, _super);
     function FakeBufferColor(x, y) {
         var _this = _super.call(this, null, null) || this;
@@ -1563,7 +1692,7 @@ exports.FakeBufferColor = FakeBufferColor;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1579,8 +1708,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var cell_grid_1 = __webpack_require__(2);
-var buffer_color_1 = __webpack_require__(27);
+var cell_grid_1 = __webpack_require__(3);
+var buffer_color_1 = __webpack_require__(28);
 function pushOntoEnd(target, data) {
     for (var i = 0; i < data.length; i++) {
         target.push(data[i]);
@@ -1598,7 +1727,7 @@ function emptyChunk() {
         verticesIndexBuffer: null
     };
 }
-var GlFrame = (function (_super) {
+var GlFrame = /** @class */ (function (_super) {
     __extends(GlFrame, _super);
     function GlFrame(dimensions, gl) {
         var _this = _super.call(this, dimensions, function (x, y) { return new buffer_color_1.FakeBufferColor(x, y); }) || this;
@@ -1688,25 +1817,6 @@ exports["default"] = GlFrame;
 
 
 /***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-function clamp(value, minimum, maximum) {
-    if (value < minimum) {
-        return minimum;
-    }
-    if (value > maximum) {
-        return maximum;
-    }
-    return value;
-}
-exports.clamp = clamp;
-
-
-/***/ }),
 /* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1714,6 +1824,7 @@ exports.clamp = clamp;
 
 exports.__esModule = true;
 function randomInt(min, max) {
+    var _a;
     if (arguments.length === 1) {
         max = min;
         min = 0;
@@ -1722,7 +1833,6 @@ function randomInt(min, max) {
         _a = [min, max], max = _a[0], min = _a[1];
     }
     return Math.floor(Math.random() * (max - min + 1)) + min;
-    var _a;
 }
 exports.randomInt = randomInt;
 function randomElement(entities) {
